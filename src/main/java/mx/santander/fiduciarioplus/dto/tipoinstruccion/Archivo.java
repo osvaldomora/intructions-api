@@ -19,7 +19,7 @@ public class Archivo implements Serializable
 	
 
 	private static final long serialVersionUID = -6655732514322381748L;
-	private String id_documento;
+	private Id id_documento;
     private String nombre_documento;
     private  Requerido requerido ;
     private Extension extension;

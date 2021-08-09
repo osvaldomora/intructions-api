@@ -12,7 +12,7 @@ import lombok.Data;
 public class InstruccionDto implements Serializable {
 
 	private Resultado resultado;
-	private Datos datos;
+	private Dato dato;
 	private final static long serialVersionUID = -5724389527430682191L;
 
 }

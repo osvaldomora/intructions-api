@@ -14,7 +14,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Datos implements Serializable
+public class Dato implements Serializable
 {
 	@JsonProperty("tipoInstrucciones")
     private List<TipoInstruccion> tipoInstrucciones = null;

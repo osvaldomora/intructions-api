@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +29,7 @@ public class Instruccion implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false)
 	private Long id;
 	
-	@Size(min = 3, max = 20)
+	@Size(min = 3, max = 100)
 	@Column(name = "TIPO_DE_INSTRUCCION")
 	private String name;
 	
@@ -37,9 +39,11 @@ public class Instruccion implements Serializable {
 	@Column(name = "NOMBRE_DOCUMENTO")
 	private String nombre_documento;
 	
-	@Column(name = "LAYOUT")
-	private Boolean layout;
+
+	@Column(name = "REQUERIDO")
+	private String requerido;
 	
+	//CREO QUE NO SE VA USAR
 	@Column(name = "DOCUMENTO_ADICIONAL")
 	private Boolean documentoAdicional;
  

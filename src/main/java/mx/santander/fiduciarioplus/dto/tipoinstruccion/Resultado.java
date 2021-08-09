@@ -12,8 +12,8 @@ import lombok.Data;
 public class Resultado implements Serializable
 {
 
-    public Integer codigo;
-    public String info;
+    private Integer codigo;
+    private String info;
     private final static long serialVersionUID = 8952891093537955279L;
 
 }

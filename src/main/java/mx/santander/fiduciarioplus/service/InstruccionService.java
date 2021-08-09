@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.Archivo;
-import mx.santander.fiduciarioplus.dto.tipoinstruccion.Datos;
+import mx.santander.fiduciarioplus.dto.tipoinstruccion.Dato;
+import mx.santander.fiduciarioplus.dto.tipoinstruccion.Extension;
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.InstruccionDto;
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.TipoInstruccion;
 import mx.santander.fiduciarioplus.model.tipoinstruccion.Instruccion;
@@ -28,20 +29,24 @@ public class InstruccionService implements IInstruccionService {
 	public InstruccionDto getInstrucciones() {
 
 		List<Instruccion> instruccionEntity = instruccionRepository.findAll();
-		List<TipoInstruccion> li=instruccionEntity.stream().map((insEntity)-> {
-			System.out.println(insEntity.getName());
-			
+		List<TipoInstruccion> li=instruccionEntity.stream().map((insEntity)-> {	
 				
 			TipoInstruccion tipoInstruccion=MODELMAPPER.map(insEntity, TipoInstruccion.class);		
 			Archivo archivo=MODELMAPPER.map(insEntity, Archivo.class);
 			tipoInstruccion.setArchivo(Arrays.asList(archivo));
-
+			
+            if(insEntity.getId_documento().equalsIgnoreCase("pdf"))
+            {
+            	archivo.setExtension(Extension.PDF);       	
+            }
+            else
+        		archivo.setExtension(Extension.TXT);
 			return tipoInstruccion;	
 		}).collect(Collectors.toList());
 		
 //		instDto.setResultado(new Resultado(200,"ok"));	
-		Datos dato = new Datos(li);
-		instDto.setDatos(dato);
+		Dato dato = new Dato(li);
+		instDto.setDato(dato);
 
 		return instDto;
 	}
