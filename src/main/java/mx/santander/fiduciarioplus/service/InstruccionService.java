@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.Archivo;
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.Dato;
-import mx.santander.fiduciarioplus.dto.tipoinstruccion.Extension;
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.InstruccionDto;
 import mx.santander.fiduciarioplus.dto.tipoinstruccion.TipoInstruccion;
+import mx.santander.fiduciarioplus.dto.tipoinstruccion.enums.Extension;
 import mx.santander.fiduciarioplus.model.tipoinstruccion.Instruccion;
 import mx.santander.fiduciarioplus.repository.IInstruccionRepository;
 @Service
