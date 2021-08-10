@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataDto {
 
-    public Folio folio;
+    public FolioDto folioDto;
 
 }

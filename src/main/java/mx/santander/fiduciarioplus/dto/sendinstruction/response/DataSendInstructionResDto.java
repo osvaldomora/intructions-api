@@ -1,5 +1,5 @@
 
-package mx.santander.fiduciarioplus.dto.sendinstruction.request;
+package mx.santander.fiduciarioplus.dto.sendinstruction.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -11,11 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DataRequestDto {
+public class DataSendInstructionResDto {
 
-    public Buc buc;
-    public String date;
-    public TypeInstruction typeInstruction;
-    public Business business;
+    public DataDto dataDto;
 
 }

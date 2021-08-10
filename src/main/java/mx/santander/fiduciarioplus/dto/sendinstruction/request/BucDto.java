@@ -1,5 +1,6 @@
+package mx.santander.fiduciarioplus.dto.sendinstruction.request;
 
-package mx.santander.fiduciarioplus.dto.sendinstruction.response;
+import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -11,8 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DataResponseDto {
+public class BucDto implements Serializable{
 
-    public DataDto dataDto;
+	public String id;
+    public String token;
 
+	private static final long serialVersionUID = 1L;
 }

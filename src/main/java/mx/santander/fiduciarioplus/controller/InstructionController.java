@@ -1,16 +1,23 @@
 package mx.santander.fiduciarioplus.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
+import mx.santander.fiduciarioplus.service.IInstructionService;
 import mx.santander.fiduciarioplus.service.ITypeInstructionService;
 
 @RestController
@@ -19,13 +26,25 @@ import mx.santander.fiduciarioplus.service.ITypeInstructionService;
 public class InstructionController {
 
 	@Autowired
-	ITypeInstructionService instructionService;
+	ITypeInstructionService typeInstructionService;
+	
+	@Autowired
+	IInstructionService instructionService;
 
 	@GetMapping(value = "/type_instructions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> listTypeInstructions() {
-		DataDto listInstruction= instructionService.getInstructions();
+		DataDto listInstruction= typeInstructionService.getInstructions();
 //		listInstruccion.stream().forEach(instruction->System.out.println(instruction));
 		return ResponseEntity.status(HttpStatus.OK).body(listInstruction);
+	}
+	
+	@PostMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> saveInstructions(@RequestParam("files") List<MultipartFile> files, String instruction){
+		DataSendInstructionResDto dataSendInstructionResDto = instructionService.save(instruction, files);
+		if(dataSendInstructionResDto == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(dataSendInstructionResDto);
 	}
 
 }
