@@ -13,7 +13,7 @@ import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.File;
 import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstruction;
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
-import mx.santander.fiduciarioplus.repository.IInstructionRepository;
+import mx.santander.fiduciarioplus.repository.ITypeInstructionRepository;
 
 @Service
 public class TypeInstructionService implements ITypeInstructionService {
@@ -21,13 +21,13 @@ public class TypeInstructionService implements ITypeInstructionService {
 //	private InstructionDto instDto = new InstructionDto();
 
 	@Autowired
-	IInstructionRepository instructionRepository;
+	ITypeInstructionRepository typeInstructionRepository;
 	public static final ModelMapper MODELMAPPER = new ModelMapper();
 
 	@Override
 	public DataDto getInstructions() {
 
-		List<Instruccion> instruccionEntity = instructionRepository.findAll();
+		List<Instruccion> instruccionEntity = typeInstructionRepository.findAll();
 		List<TypeInstruction> li = instruccionEntity.stream().map((insEntity) -> {
 
 			TypeInstruction typeInstruction = MODELMAPPER.map(insEntity, TypeInstruction.class);

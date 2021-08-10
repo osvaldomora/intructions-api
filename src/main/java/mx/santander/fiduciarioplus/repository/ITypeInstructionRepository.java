@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
 
-public interface IInstructionRepository extends JpaRepository<Instruccion, Long> {
+public interface ITypeInstructionRepository extends JpaRepository<Instruccion, Long> {
 	
 	
 
