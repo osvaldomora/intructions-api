@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Extension;
-import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Id;
-import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Required;
+import mx.santander.fiduciarioplus.dto.enums.Extension;
+import mx.santander.fiduciarioplus.dto.enums.Id;
+import mx.santander.fiduciarioplus.dto.enums.Required;
 
 
 @AllArgsConstructor

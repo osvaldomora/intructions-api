@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
-import mx.santander.fiduciarioplus.service.IInstructionService;
+import mx.santander.fiduciarioplus.service.ITypeInstructionService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200",methods = {RequestMethod.GET,RequestMethod.POST})
@@ -19,7 +19,7 @@ import mx.santander.fiduciarioplus.service.IInstructionService;
 public class InstructionController {
 
 	@Autowired
-	IInstructionService instructionService;
+	ITypeInstructionService instructionService;
 
 	@GetMapping(value = "/type_instructions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> listTypeInstructions() {

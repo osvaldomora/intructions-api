@@ -8,15 +8,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import mx.santander.fiduciarioplus.dto.enums.Extension;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.File;
 import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstruction;
-import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Extension;
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
 import mx.santander.fiduciarioplus.repository.IInstructionRepository;
 
 @Service
-public class InstructionService implements IInstructionService {
+public class TypeInstructionService implements ITypeInstructionService {
 
 //	private InstructionDto instDto = new InstructionDto();
 
