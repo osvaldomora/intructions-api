@@ -1,5 +1,5 @@
 
-package mx.santander.fiduciarioplus.dto.tipoinstruccion;
+package mx.santander.fiduciarioplus.dto.typeinstruction;
 
 import java.io.Serializable;
 
@@ -8,23 +8,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mx.santander.fiduciarioplus.dto.tipoinstruccion.enums.Extension;
-import mx.santander.fiduciarioplus.dto.tipoinstruccion.enums.Id;
-import mx.santander.fiduciarioplus.dto.tipoinstruccion.enums.Requerido;
+import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Extension;
+import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Id;
+import mx.santander.fiduciarioplus.dto.typeinstruction.enums.Required;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Archivo implements Serializable
+public class File implements Serializable
 {
 	
 
 	private static final long serialVersionUID = -6655732514322381748L;
 	private Id id_documento;
     private String nombre_documento;
-    private  Requerido requerido ;
+    private  Required requerido ;
     private Extension extension;
     
 

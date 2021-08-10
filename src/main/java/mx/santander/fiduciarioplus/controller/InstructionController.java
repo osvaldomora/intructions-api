@@ -10,22 +10,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import mx.santander.fiduciarioplus.dto.tipoinstruccion.InstruccionDto;
-import mx.santander.fiduciarioplus.service.IInstruccionService;
+import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
+import mx.santander.fiduciarioplus.service.IInstructionService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200",methods = {RequestMethod.GET,RequestMethod.POST})
-@RequestMapping("/instrucciones/v1")
-public class InstruccionController {
+@RequestMapping("/instructions/v1")
+public class InstructionController {
 
 	@Autowired
-	IInstruccionService instruccionService;
+	IInstructionService instructionService;
 
-	@GetMapping(value = "/tipo_instrucciones", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listarTipoInstrucciones() {
-		InstruccionDto listInstruccion= instruccionService.getInstrucciones();
+	@GetMapping(value = "/type_instructions", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> listTypeInstructions() {
+		DataDto listInstruction= instructionService.getInstructions();
 //		listInstruccion.stream().forEach(instruction->System.out.println(instruction));
-		return ResponseEntity.status(HttpStatus.OK).body(listInstruccion);
+		return ResponseEntity.status(HttpStatus.OK).body(listInstruction);
 	}
 
 }

@@ -1,5 +1,5 @@
 
-package mx.santander.fiduciarioplus.dto.tipoinstruccion;
+package mx.santander.fiduciarioplus.dto.typeinstruction;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TipoInstruccion implements Serializable
+public class TypeInstruction implements Serializable
 {
 
     public Long id;
     public String name;
-    public List<Archivo> archivo = null;
+    public List<File> file = null;
     private final static long serialVersionUID = -3651510353810542647L;
 
 }

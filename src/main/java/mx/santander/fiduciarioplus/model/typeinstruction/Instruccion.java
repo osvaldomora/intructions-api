@@ -1,4 +1,4 @@
-package mx.santander.fiduciarioplus.model.tipoinstruccion;
+package mx.santander.fiduciarioplus.model.typeinstruction;
 
 import java.io.Serializable;
 
