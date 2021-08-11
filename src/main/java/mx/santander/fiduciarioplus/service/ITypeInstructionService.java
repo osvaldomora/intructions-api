@@ -1,9 +1,9 @@
 package mx.santander.fiduciarioplus.service;
 
-import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
+import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
 
 
 public interface ITypeInstructionService {
-	public DataDto getInstructions();
+	public DataTypeInstructionResDto getInstructions();
 
 }

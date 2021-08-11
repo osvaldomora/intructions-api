@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TypeInstruction implements Serializable
+public class TypeInstructionDto implements Serializable
 {
 
     public Long id;
     public String name;
-    public List<File> file = null;
+    public List<FileDto> files = null;
     private final static long serialVersionUID = -3651510353810542647L;
 
 }

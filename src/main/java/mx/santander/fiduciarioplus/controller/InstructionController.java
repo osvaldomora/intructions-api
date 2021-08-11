@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
-import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
+import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
 import mx.santander.fiduciarioplus.service.IInstructionService;
 import mx.santander.fiduciarioplus.service.ITypeInstructionService;
 
@@ -33,9 +33,8 @@ public class InstructionController {
 
 	@GetMapping(value = "/type_instructions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> listTypeInstructions() {
-		DataDto listInstruction= typeInstructionService.getInstructions();
-//		listInstruccion.stream().forEach(instruction->System.out.println(instruction));
-		return ResponseEntity.status(HttpStatus.OK).body(listInstruction);
+		DataTypeInstructionResDto dataTypeInstructionResDto = typeInstructionService.getInstructions();
+		return ResponseEntity.status(HttpStatus.OK).body(dataTypeInstructionResDto);
 	}
 	
 	@PostMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
