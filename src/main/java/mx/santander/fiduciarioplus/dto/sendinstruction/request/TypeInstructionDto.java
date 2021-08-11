@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TypeInstructionDto implements Serializable{
 
-    public String id;
-    public String name;
+	private String id;
+	private String name;
     
 	private static final long serialVersionUID = 1L;
 

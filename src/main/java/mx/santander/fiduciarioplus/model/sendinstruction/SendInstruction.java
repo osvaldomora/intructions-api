@@ -9,14 +9,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "SEND_INSTRUCTION")
-public class Instruction {
+public class SendInstruction {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +38,7 @@ public class Instruction {
 	private String idTypeInstruction;
 	
 	@Column(name = "NAME_INSTRUCTION")
-	private String name;
+	private String nameInstruction;
 	
 	@Column(name = "ID_BUSINESS")
 	private String idBusiness;

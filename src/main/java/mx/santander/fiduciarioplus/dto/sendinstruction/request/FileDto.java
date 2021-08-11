@@ -18,4 +18,5 @@ public class FileDto {
 	private String fileName;
 	private String extension;
 	private Long size;
+	private String fileBase64;
 }

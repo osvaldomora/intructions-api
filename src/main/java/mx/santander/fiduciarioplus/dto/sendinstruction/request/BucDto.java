@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BucDto implements Serializable{
 
-	public String id;
-    public String token;
+	private String id;
+    private String token;
 
 	private static final long serialVersionUID = 1L;
 }

@@ -17,8 +17,12 @@ import mx.santander.fiduciarioplus.dto.sendinstruction.request.FileDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.FolioDto;
+import mx.santander.fiduciarioplus.model.sendinstruction.SendFIle;
+import mx.santander.fiduciarioplus.model.sendinstruction.SendInstruction;
+import mx.santander.fiduciarioplus.repository.IInstrucctionFIleRepository;
 import mx.santander.fiduciarioplus.repository.IInstructionRepository;
 import mx.santander.fiduciarioplus.util.FileEncoder;
+import mx.santander.fiduciarioplus.util.FolioRandom;
 
 @Service
 public class IntructionService implements IInstructionService{
@@ -26,22 +30,71 @@ public class IntructionService implements IInstructionService{
 	@Autowired
 	private IInstructionRepository instructionRepository;
 	
+	@Autowired
+	private IInstrucctionFIleRepository instrucctionFIleRepository;
+	
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
-	private final Long MAX_SIZE_FILE = 15360L;
+	private final Long MAX_SIZE_FILE_BYTES = 15728640L;
 
 	@Override
-	public DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstruction) {
+	public DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstructionDto) {
+		SendInstruction sendInstructionEntity = null;
+		String folioRandom = FolioRandom.getRandomFolio();
+		LOG.info("SendInstruction: "+sendInstructionDto.toString());
+		sendInstructionEntity = SendInstruction.builder()
+							.buc(sendInstructionDto.getBuc().getId())
+							.token(sendInstructionDto.getBuc().getToken())
+							.date(sendInstructionDto.getDate())
+							.idTypeInstruction(sendInstructionDto.getTypeInstruction().getId())
+							.nameInstruction(sendInstructionDto.getTypeInstruction().getName())
+							.idBusiness(sendInstructionDto.getBusiness().getId())
+							.idSubBusiness(sendInstructionDto.getBusiness().getSubBusiness().getId())
+							.idFolio(folioRandom)
+							.build();
+		//Se envia registro de Instruccion a BD y valida envio
+		SendInstruction sendInstructionEntityResult =  this.instructionRepository.save(sendInstructionEntity);
+		if(sendInstructionEntityResult == null) {
+			throw new RuntimeException("Error al guardar instruccion en BD");
+		}
+		//Se genera respuesta de Folio
+		DataSendInstructionResDto dataSendInstructionResDto = DataSendInstructionResDto.builder()
+																.dataDto(new DataDto
+																			(new FolioDto(sendInstructionEntityResult.getIdFolio(), sendInstructionEntityResult.getDate()))
+																		)
+																.build();		
 		// TODO Auto-generated method stub
-		return null;
+		return dataSendInstructionResDto;
 	}
 
 	@Override
 	public void saveDocument(MultipartFile file) {
-		
 		String fileEncode64 = "";
+		FileDto fileDto = null;
+		SendFIle sendFIleEntity = null;
 		try {
+			//Se obtiene file en Base 64
 			fileEncode64 = FileEncoder.encode64(file);
+			//Se crea Dto del file
+			fileDto =FileDto.builder()
+						.fileFullName(file.getOriginalFilename())
+						.fileName(file.getOriginalFilename().split("\\.")[0])
+						.extension(file.getOriginalFilename().split("\\.")[1])
+						.size(file.getSize())
+						.fileBase64(fileEncode64)
+						.build();
+			LOG.info("FileDto: "+fileDto.toString());
+			//Se hace map de DTO a Entity
+			sendFIleEntity = SendFIle.builder()
+							.fileFullName(fileDto.getFileFullName())
+							.fileName(fileDto.getFileName())
+							.extension(fileDto.getExtension())
+							.size(fileDto.getSize())
+							.fileBase64(fileDto.getFileBase64())
+							.build();
+			//Guarda en repository (Simulacion de FileNet)
+			this.instrucctionFIleRepository.save(sendFIleEntity);
+			LOG.info("Se a enviado con exito el archivo: "+fileDto.getFileFullName());
 		} catch (IOException e) {
 			throw new RuntimeException("Error al codificar archivo a base64: "+e.getMessage());
 		}
@@ -53,7 +106,7 @@ public class IntructionService implements IInstructionService{
 	public DataSendInstructionResDto save(String sendInstructionJson, List<MultipartFile> files) {
 		ObjectMapper mapper = new ObjectMapper();
 		DataSendInstructionReqDto dataSendInstructionReqDto = null;
-		FileDto fileDto = null;
+
 		try {
 			 dataSendInstructionReqDto = mapper.readValue(sendInstructionJson, DataSendInstructionReqDto.class);
 		} catch (JsonProcessingException | IllegalArgumentException e) {
@@ -67,36 +120,17 @@ public class IntructionService implements IInstructionService{
 		}
 		for(MultipartFile file : files) {
 			LOG.info("Tamaño de archivo en KB: "+file.getSize());
-			if(file.getSize() > MAX_SIZE_FILE) {
+			if(file.getSize() > MAX_SIZE_FILE_BYTES) {
 				throw new RuntimeException("Se ha superado el tamanio maximo del documento");
 			}
 			if(file.getSize() == 0) {
 				throw new RuntimeException("El documento esta vacio");
 			}
-			fileDto = FileDto.builder()
-							.fileFullName(file.getOriginalFilename())
-							.fileName(file.getName())
-							.extension(file.getOriginalFilename().split("\\.")[1])
-							.size(file.getSize())
-							.build();
 			//Enviar archivo
 			this.saveDocument(file);
 		}
-			
-		
-		
-		
-		
-		LOG.info("SendInstruction: "+dataSendInstructionReqDto.toString());
-		LOG.info("FileDto: "+fileDto.toString());
-		
-		DataSendInstructionResDto res = new DataSendInstructionResDto();
-		FolioDto folioDto = new FolioDto();
-		folioDto.setId("F123456789");
-		DataDto dataDto = new  DataDto();
-		dataDto.setFolioDto(folioDto);
-		res.setDataDto(dataDto);
-		return res;
+		//Se guarda registro en BD y regresa Folio
+		return this.saveInstruction(dataSendInstructionReqDto);
 	}
 
 }

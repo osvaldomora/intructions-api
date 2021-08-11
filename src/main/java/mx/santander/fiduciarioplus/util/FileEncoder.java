@@ -11,7 +11,7 @@ public class FileEncoder {
 		StringBuffer fileEncode = new StringBuffer();
 
 		byte fileBytes[] = file.getBytes();
-		byte encodeBytes[] = Base64.getEncoder().encode(fileBytes);
+		String encodeBytes = Base64.getEncoder().encodeToString(fileBytes);
 		fileEncode.append(encodeBytes);
 
 		return fileEncode.toString();
