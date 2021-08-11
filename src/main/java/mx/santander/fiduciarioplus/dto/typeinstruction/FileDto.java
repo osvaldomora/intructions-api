@@ -17,14 +17,14 @@ import mx.santander.fiduciarioplus.dto.enums.Required;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class File implements Serializable
+public class FileDto implements Serializable
 {
 	
 
 	private static final long serialVersionUID = -6655732514322381748L;
-	private Id id_documento;
-    private String nombre_documento;
-    private  Required requerido ;
+	private Id fileId;
+    private String fileName;
+    private  Required required ;
     private Extension extension;
     
 

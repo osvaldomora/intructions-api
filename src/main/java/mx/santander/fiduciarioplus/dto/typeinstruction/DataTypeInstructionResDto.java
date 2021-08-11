@@ -9,16 +9,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DataDto implements Serializable
+public class DataTypeInstructionResDto implements Serializable
 {
 	
-    private List<TypeInstructionDto> typeInstructions = null;
+    private DataDto data = null;
     private final static long serialVersionUID = -6086575825938718698L;
 
 }
+ 

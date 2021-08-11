@@ -10,42 +10,42 @@ import org.springframework.stereotype.Service;
 
 import mx.santander.fiduciarioplus.dto.enums.Extension;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
-import mx.santander.fiduciarioplus.dto.typeinstruction.File;
-import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstruction;
+import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
+import mx.santander.fiduciarioplus.dto.typeinstruction.FileDto;
+import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstructionDto;
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
 import mx.santander.fiduciarioplus.repository.ITypeInstructionRepository;
 
 @Service
 public class TypeInstructionService implements ITypeInstructionService {
 
-//	private InstructionDto instDto = new InstructionDto();
 
 	@Autowired
 	ITypeInstructionRepository typeInstructionRepository;
 	public static final ModelMapper MODELMAPPER = new ModelMapper();
 
 	@Override
-	public DataDto getInstructions() {
+	public DataTypeInstructionResDto getInstructions() {
 
 		List<Instruccion> instruccionEntity = typeInstructionRepository.findAll();
-		List<TypeInstruction> li = instruccionEntity.stream().map((insEntity) -> {
+		List<TypeInstructionDto> li = instruccionEntity.stream().map((insEntity) -> {
 
-			TypeInstruction typeInstruction = MODELMAPPER.map(insEntity, TypeInstruction.class);
-			File file = MODELMAPPER.map(insEntity, File.class);
-			typeInstruction.setFile(Arrays.asList(file));
+			TypeInstructionDto typeInstruction = MODELMAPPER.map(insEntity, TypeInstructionDto.class);
+			FileDto file = MODELMAPPER.map(insEntity, FileDto.class);
+			typeInstruction.setFiles(Arrays.asList(file));
 
-			if (insEntity.getId_documento().equalsIgnoreCase("pdf")) {
+			if (insEntity.getFileId().equalsIgnoreCase("pdf")) {
 				file.setExtension(Extension.PDF);
 			} else
 				file.setExtension(Extension.TXT);
 			return typeInstruction;
 		}).collect(Collectors.toList());
 
-//		instDto.setResultado(new Resultado(200,"ok"));	
 		DataDto data = new DataDto(li);
-		data.setTypeInstruction(li);
+		data.setTypeInstructions(li);
+		DataTypeInstructionResDto dataTypeInstructionResDto = new DataTypeInstructionResDto(data);
 
-		return data;
+		return dataTypeInstructionResDto;
 	}
 
 }

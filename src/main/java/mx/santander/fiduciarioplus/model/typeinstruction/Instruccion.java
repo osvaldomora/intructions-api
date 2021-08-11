@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,14 +32,14 @@ public class Instruccion implements Serializable {
 	private String name;
 	
 	@Column(name = "ID_DOCUMENTO")
-	private String id_documento;
+	private String fileId;
 	
 	@Column(name = "NOMBRE_DOCUMENTO")
-	private String nombre_documento;
+	private String fileName;
 	
 
 	@Column(name = "REQUERIDO")
-	private String requerido;
+	private String required;
 	
 	//CREO QUE NO SE VA USAR
 	@Column(name = "DOCUMENTO_ADICIONAL")
