@@ -1,7 +1,10 @@
 package mx.santander.fiduciarioplus.service;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,12 +18,15 @@ import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.FolioDto;
 import mx.santander.fiduciarioplus.repository.IInstructionRepository;
+import mx.santander.fiduciarioplus.util.FileEncoder;
 
 @Service
 public class IntructionService implements IInstructionService{
 	
 	@Autowired
 	private IInstructionRepository instructionRepository;
+	
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	private final Long MAX_SIZE_FILE = 15360L;
 
@@ -32,7 +38,14 @@ public class IntructionService implements IInstructionService{
 
 	@Override
 	public void saveDocument(MultipartFile file) {
-		// TODO Auto-generated method stub
+		
+		String fileEncode64 = "";
+		try {
+			fileEncode64 = FileEncoder.encode64(file);
+		} catch (IOException e) {
+			throw new RuntimeException("Error al codificar archivo a base64: "+e.getMessage());
+		}
+		LOG.info("Archivo codificado base64: "+fileEncode64);
 		
 	}
 
@@ -43,30 +56,39 @@ public class IntructionService implements IInstructionService{
 		FileDto fileDto = null;
 		try {
 			 dataSendInstructionReqDto = mapper.readValue(sendInstructionJson, DataSendInstructionReqDto.class);
-		} catch (JsonProcessingException e) {
+		} catch (JsonProcessingException | IllegalArgumentException e) {
 			throw new RuntimeException("Error al mapear JSON a DTO: "+e.getMessage());
 		}
 		//El servicio solo admite un unico documento
-		if(files.size() > 0 && files.size() < 2 && !files.isEmpty()) {
-			for(MultipartFile file : files) {
-				if(file.getSize() > MAX_SIZE_FILE) {
-					throw new RuntimeException("Se ha superado el tamanio maximo del documento");
-				}
-				fileDto = FileDto.builder()
-									.fileFullName(file.getOriginalFilename())
-									.fileName(file.getName())
-									.extension(file.getOriginalFilename().split("\\.")[1])
-									.size(file.getSize())
-									.build();
-			}
-		}else {
+		LOG.info("Tamaño lista archivos: "+String.valueOf(files.size()));
+		LOG.info("Lista vacia: "+String.valueOf(files.isEmpty()));
+		if(files.size() > 1 ||  files.isEmpty()) {
 			throw new RuntimeException("Se han enviado mas documentos de los esperados");
 		}
+		for(MultipartFile file : files) {
+			LOG.info("Tamaño de archivo en KB: "+file.getSize());
+			if(file.getSize() > MAX_SIZE_FILE) {
+				throw new RuntimeException("Se ha superado el tamanio maximo del documento");
+			}
+			if(file.getSize() == 0) {
+				throw new RuntimeException("El documento esta vacio");
+			}
+			fileDto = FileDto.builder()
+							.fileFullName(file.getOriginalFilename())
+							.fileName(file.getName())
+							.extension(file.getOriginalFilename().split("\\.")[1])
+							.size(file.getSize())
+							.build();
+			//Enviar archivo
+			this.saveDocument(file);
+		}
+			
 		
 		
 		
-		System.out.println("SendInstruction: "+dataSendInstructionReqDto.toString());
-		System.out.println("FileDto: "+fileDto.toString());
+		
+		LOG.info("SendInstruction: "+dataSendInstructionReqDto.toString());
+		LOG.info("FileDto: "+fileDto.toString());
 		
 		DataSendInstructionResDto res = new DataSendInstructionResDto();
 		FolioDto folioDto = new FolioDto();

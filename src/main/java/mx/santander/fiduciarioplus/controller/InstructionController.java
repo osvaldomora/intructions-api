@@ -38,13 +38,21 @@ public class InstructionController {
 		return ResponseEntity.status(HttpStatus.OK).body(listInstruction);
 	}
 	
-	@PostMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> saveInstructions(@RequestParam("files") List<MultipartFile> files, String instruction){
+	@PostMapping(value = "/instructions", 
+				produces = MediaType.APPLICATION_JSON_VALUE, 
+				consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> saveInstructions(@RequestParam(name = "files", required = true) List<MultipartFile> files, 
+											  @RequestParam(name = "instruction", required = true) String instruction){
 		DataSendInstructionResDto dataSendInstructionResDto = instructionService.save(instruction, files);
 		if(dataSendInstructionResDto == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(dataSendInstructionResDto);
 	}
-
+	/*Errores 
+	 * MissingServletRequestParameterException
+	 * MissingServletRequestPartException
+	 * HttpMediaTypeNotSupportedException
+	 */
+	
 }
