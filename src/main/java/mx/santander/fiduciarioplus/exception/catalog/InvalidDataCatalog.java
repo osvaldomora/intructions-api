@@ -7,11 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum InvalidDataCatalog {
 	//Catalogo de Errores
-		ERROR001("InvalidDataException","CODIGO.001","Mensaje del error 001"),
-		ERROR002("InvalidDataException","CODIGO.001","Mensaje del error 002"),
-		ERROR003("InvalidDataException","CODIGO.001","Mensaje del error 003"),
-		ERROR004("InvalidDataException","CODIGO.002","Mensaje del error 001");
-		
+		INVD001("InvalidDataException","INVD.001","Error al mapear datos entrada/salida."),
+		INVD002("InvalidDataException","INVD.002","Error al codificar archivo.");
+	
 		private final String type;
 		private final String code;
 		private final String message;

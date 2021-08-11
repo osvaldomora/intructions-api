@@ -15,8 +15,10 @@ import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto
 import mx.santander.fiduciarioplus.dto.typeinstruction.FileDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstructionDto;
 import mx.santander.fiduciarioplus.exception.BusinessException;
+import mx.santander.fiduciarioplus.exception.PersistentException;
 import mx.santander.fiduciarioplus.exception.catalog.BusinessCatalog;
 import mx.santander.fiduciarioplus.exception.catalog.LevelException;
+import mx.santander.fiduciarioplus.exception.catalog.PersistentDataCatalog;
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
 import mx.santander.fiduciarioplus.repository.ITypeInstructionRepository;
 
@@ -33,12 +35,11 @@ public class TypeInstructionService implements ITypeInstructionService {
 
 		List<Instruccion> instruccionEntity = typeInstructionRepository.findAll();
 		if(instruccionEntity.isEmpty()) {		
-			throw new BusinessException(HttpStatus.NOT_FOUND,	//HttpSataus
-					BusinessCatalog.ERROR001.getCode(), //Code
-					BusinessCatalog.ERROR001.getMessage(),	//Message	//No se encontro recurso
-					LevelException.ERROR.toString(),	//Level 
-					"No se encontraron datos en la base de datos"); //Description
-			
+			throw new PersistentException(HttpStatus.CONFLICT,
+					PersistentDataCatalog.PSID001.getCode(), 
+					PersistentDataCatalog.PSID001.getMessage(),
+					LevelException.ERROR.toString(), 
+					"No se encontraron datos en la base de datos.");			
 		}
 		List<TypeInstructionDto> li = instruccionEntity.stream().map((insEntity) -> {
 

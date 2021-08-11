@@ -10,14 +10,10 @@ import lombok.Getter;
 public enum BusinessCatalog{
 
 	//Catalogo de Errores
-	ERROR001("BusinessException","CODIGO.001","Mensaje del error 001"),
-	ERROR002("BusinessException","CODIGO.001","Mensaje del error 002"),
-	ERROR003("BusinessException","CODIGO.001","Mensaje del error 003"),
-	ERROR004("BusinessException","CODIGO.002","Mensaje del error 001"),
-	ERROR005("BusinessException","CODIGO.003","Mensaje del error 001"),
-	ERROR006("BusinessException","CODIGO.004","Mensaje del error 001"),
-	ERROR007("BusinessException","CODIGO.004","Mensaje del error 004");
-
+	BUSI001("BusinessException","BUSI.001","Error el documento no puede exceder el minimo y maximo de tamaño."),
+	BUSI002("BusinessException","BUSI.002","Formato de archivo no soportado."),
+	BUSI003("BusinessException","BUSI.003","Se ha excedido el limite de archivos.");
+	
 	private final String type;
 	private final String code;
 	private final String message;

@@ -21,8 +21,8 @@ import mx.santander.fiduciarioplus.service.IInstructionService;
 import mx.santander.fiduciarioplus.service.ITypeInstructionService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200",methods = {RequestMethod.GET,RequestMethod.POST})
-@RequestMapping("/instructions/v1")
+@CrossOrigin(origins = "*",methods = {RequestMethod.GET,RequestMethod.POST}, allowedHeaders = "*")
+@RequestMapping("/api/instructions/v1")
 public class InstructionController {
 
 	@Autowired
