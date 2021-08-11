@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -37,7 +38,6 @@ public class Instruccion implements Serializable {
 	@Column(name = "NOMBRE_DOCUMENTO")
 	private String fileName;
 	
-
 	@Column(name = "REQUERIDO")
 	private String required;
 	

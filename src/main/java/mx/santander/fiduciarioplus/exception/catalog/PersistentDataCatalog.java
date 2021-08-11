@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PersistentDataCatalog {
 
-	PSID001("BusinessException","PSID.001","Error al realizar la transaccion."),
-	PSID002("BusinessException","PSID.002","Error de conexion.");
+	PSID001("PersistentException","PSID.001","Error al realizar la transaccion."),
+	PSID002("PersistentException","PSID.002","Error de conexion.");
 	
 	private final String type;
 	private final String code;
