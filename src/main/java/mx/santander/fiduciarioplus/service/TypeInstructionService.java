@@ -40,7 +40,7 @@ public class TypeInstructionService implements ITypeInstructionService {
 		try {
 		 instruccionEntity = typeInstructionRepository.findAll();
 		}catch (Exception e) {
-			LOG.info("error"+e);
+			LOG.info("error:"+e);
 			throw new PersistentException(HttpStatus.CONFLICT, PersistentDataCatalog.PSID001.getCode(),
 					PersistentDataCatalog.PSID001.getMessage(), LevelException.ERROR.toString(),
 					"No se encontraron datos en la base de datos.");
@@ -52,7 +52,7 @@ public class TypeInstructionService implements ITypeInstructionService {
 
 				TypeInstructionDto typeInstruction = MODELMAPPER.map(insEntity, TypeInstructionDto.class);
 				FileDto file = MODELMAPPER.map(insEntity, FileDto.class);
-				if(insEntity.getId()==3)
+				if(insEntity.getId()==1 ||insEntity.getId()==3 || insEntity.getId()==5)
 					typeInstruction.setFiles(new ArrayList<>());
 				else
 				typeInstruction.setFiles(Arrays.asList(file));
