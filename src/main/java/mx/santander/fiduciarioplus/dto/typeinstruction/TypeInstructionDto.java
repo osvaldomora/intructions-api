@@ -19,8 +19,9 @@ import lombok.NoArgsConstructor;
 public class TypeInstructionDto implements Serializable
 {
 
-    public Long id;
-    public String name;
+    private Long id;
+    private String name;
+    private String urlInstruction;
     public List<FileDto> files = null;
     private final static long serialVersionUID = -3651510353810542647L;
 

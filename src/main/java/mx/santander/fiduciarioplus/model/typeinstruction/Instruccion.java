@@ -28,6 +28,10 @@ public class Instruccion implements Serializable {
 	@Column(name = "ID", unique = true, nullable = false)
 	private Long id;
 	
+	
+	@Column(name = "URL_INSTRUCTION")
+	private String urlInstruction;
+	
 	@Size(min = 3, max = 100)
 	@Column(name = "TIPO_DE_INSTRUCCION")
 	private String name;
@@ -41,9 +45,7 @@ public class Instruccion implements Serializable {
 	@Column(name = "REQUERIDO")
 	private String required;
 	
-	//CREO QUE NO SE VA USAR
-	@Column(name = "DOCUMENTO_ADICIONAL")
-	private Boolean documentoAdicional;
+
  
 
 }
