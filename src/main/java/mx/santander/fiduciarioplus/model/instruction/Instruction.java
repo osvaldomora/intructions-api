@@ -17,7 +17,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "SEND_INSTRUCTION")
+@Table(name = "INSTRUCTION")
 public class Instruction {
 
 	@Id
