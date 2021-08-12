@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mx.santander.fiduciarioplus.dto.enums.Extension;
-import mx.santander.fiduciarioplus.dto.enums.Id;
-import mx.santander.fiduciarioplus.dto.enums.Required;
+import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
+import mx.santander.fiduciarioplus.dto.enums.IdFile;
+import mx.santander.fiduciarioplus.dto.enums.RequiredFile;
 
 
 @AllArgsConstructor
@@ -22,10 +22,10 @@ public class FileDto implements Serializable
 	
 
 	private static final long serialVersionUID = -6655732514322381748L;
-	private Id fileId;
+	private IdFile fileId;
     private String fileName;
-    private  Required required ;
-    private Extension extension;
+    private  RequiredFile requiredFile ;
+    private ExtensionFile extensionFile;
     
 
 }

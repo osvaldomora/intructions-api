@@ -1,5 +1,5 @@
 package mx.santander.fiduciarioplus.dto.enums;
 
-public enum Id {
-	LAYOUT,ANEXO
+public enum RequiredFile {
+	TRUE,OPCIONAL
 }

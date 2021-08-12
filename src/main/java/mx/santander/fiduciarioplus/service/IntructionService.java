@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import mx.santander.fiduciarioplus.dto.enums.Extension;
+import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.DataSendInstructionReqDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.FileDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
@@ -26,8 +26,8 @@ import mx.santander.fiduciarioplus.exception.catalog.BusinessCatalog;
 import mx.santander.fiduciarioplus.exception.catalog.InvalidDataCatalog;
 import mx.santander.fiduciarioplus.exception.catalog.LevelException;
 import mx.santander.fiduciarioplus.exception.catalog.PersistentDataCatalog;
+import mx.santander.fiduciarioplus.model.instruction.Instruction;
 import mx.santander.fiduciarioplus.model.sendinstruction.SendFIle;
-import mx.santander.fiduciarioplus.model.sendinstruction.SendInstruction;
 import mx.santander.fiduciarioplus.repository.IInstrucctionFIleRepository;
 import mx.santander.fiduciarioplus.repository.IInstructionRepository;
 import mx.santander.fiduciarioplus.util.FileEncoder;
@@ -48,10 +48,10 @@ public class IntructionService implements IInstructionService{
 
 	@Override
 	public DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstructionDto) {
-		SendInstruction sendInstructionEntity = null;
+		Instruction sendInstructionEntity = null;
 		String folioRandom = FolioRandom.getRandomFolio();
 		LOG.info("SendInstruction: "+sendInstructionDto.toString());
-		sendInstructionEntity = SendInstruction.builder()
+		sendInstructionEntity = Instruction.builder()
 							.buc(sendInstructionDto.getBuc().getId())
 							.token(sendInstructionDto.getBuc().getToken())
 							.date(sendInstructionDto.getDate())
@@ -62,7 +62,7 @@ public class IntructionService implements IInstructionService{
 							.idFolio(folioRandom)
 							.build();
 		//Se envia registro de Instruccion a BD y valida envio
-		SendInstruction sendInstructionEntityResult =  this.instructionRepository.save(sendInstructionEntity);
+		Instruction sendInstructionEntityResult =  this.instructionRepository.save(sendInstructionEntity);
 		if(sendInstructionEntityResult == null) {
 			throw new PersistentException(HttpStatus.CONFLICT,
 						PersistentDataCatalog.PSID001.getCode(), 
@@ -153,7 +153,7 @@ public class IntructionService implements IInstructionService{
 						LevelException.ERROR.toString(),
 						"El archivo ha superado el limite de 15MB.");
 			}
-			if(!file.getOriginalFilename().split("\\.")[1].equalsIgnoreCase(Extension.PDF.toString())) {	//Valida tipo de archivo, disponible solo PDF
+			if(!file.getOriginalFilename().split("\\.")[1].equalsIgnoreCase(ExtensionFile.PDF.toString())) {	//Valida tipo de archivo, disponible solo PDF
 				throw new BusinessException(HttpStatus.BAD_REQUEST,
 						BusinessCatalog.BUSI002.getCode(),
 						BusinessCatalog.BUSI002.getMessage(),

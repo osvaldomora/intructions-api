@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import mx.santander.fiduciarioplus.dto.enums.Extension;
+import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.FileDto;
@@ -59,9 +59,9 @@ public class TypeInstructionService implements ITypeInstructionService {
 
 				if(insEntity.getFileId()!=null )
 				{if (insEntity.getFileId().equalsIgnoreCase("pdf")) {
-					file.setExtension(Extension.PDF);
+					file.setExtensionFile(ExtensionFile.PDF);
 				} else
-					file.setExtension(Extension.TXT);}
+					file.setExtensionFile(ExtensionFile.TXT);}
 				return typeInstruction;
 			}).collect(Collectors.toList());
 

@@ -1,4 +1,4 @@
-package mx.santander.fiduciarioplus.model.sendinstruction;
+package mx.santander.fiduciarioplus.model.instruction;
 
 import java.util.Date;
 
@@ -18,7 +18,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "SEND_INSTRUCTION")
-public class SendInstruction {
+public class Instruction {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +45,15 @@ public class SendInstruction {
 	
 	@Column(name = "ID_SUB_BUSINESS")
 	private String idSubBusiness;
+	
+	@Column(name = "STATUS_INSTRUCTION")
+	private String status;
+	
+	@Column(name = "CAUSE_STATUS")
+	private String statusCause;
+	
+	@Column(name = "FILE_URL")
+	private String fileUrl;
 	
 	@Column(name = "ID_FOLIO")
 	private String idFolio;
