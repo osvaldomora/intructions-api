@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
+import mx.santander.fiduciarioplus.dto.enums.StatusInstruction;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.DataSendInstructionReqDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.FileDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
@@ -59,6 +60,8 @@ public class IntructionService implements IInstructionService{
 							.nameInstruction(sendInstructionDto.getTypeInstruction().getName())
 							.idBusiness(sendInstructionDto.getBusiness().getId())
 							.idSubBusiness(sendInstructionDto.getBusiness().getSubBusiness().getId())
+							.status(StatusInstruction.SOLICITADA.toString())	//Se agrega por defaul al crear instrucction
+							.fileUrl("http://localhost") //Se agrega por defaul al crear instrucction
 							.idFolio(folioRandom)
 							.build();
 		//Se envia registro de Instruccion a BD y valida envio
