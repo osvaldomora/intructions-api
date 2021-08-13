@@ -205,7 +205,7 @@ public class IntructionService implements IInstructionService{
 					instructionsEntity = instructionRepository.findByBuc(buc);
 					LOG.info("TAMAÑO INSTRUCTIONS ENTITY: "+instructionsEntity.size());
 					for(Instruction i : instructionsEntity) {
-						LOG.info(i.getBuc());
+						LOG.info(i.getIdInstruction().toString());
 					}
 					
 					//Se trata la exception si viene vacia la lista de la entidad 
