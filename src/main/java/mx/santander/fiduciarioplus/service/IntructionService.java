@@ -1,6 +1,7 @@
 package mx.santander.fiduciarioplus.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
 import mx.santander.fiduciarioplus.dto.enums.StatusInstruction;
+import mx.santander.fiduciarioplus.dto.listinstructions.*;
+import mx.santander.fiduciarioplus.dto.listinstructions.InstructionsResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.DataSendInstructionReqDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.FileDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
@@ -175,6 +178,72 @@ public class IntructionService implements IInstructionService{
 		}
 		//Se guarda registro en BD y regresa Folio
 		return this.saveInstruction(dataSendInstructionReqDto);
+	}
+
+	@Override
+	public InstructionsResDto getListInstructions(String buc) {
+		// TODO Auto-generated method stub
+		//Se crea el objeto de instructionsResDto
+				InstructionsResDto instructionsResDto = null;
+				//Se crea una lista de la entidad
+				 List<Instruction> instructionsEntity=null;
+				//Se crea un lista para los DTO 
+				List<InstructionDto> instructionsDto = new ArrayList<>();
+				
+				/*
+				 //Se crea una lista de la entidad
+				 List<Instruction> instructionsEntity=null;
+				 //Se crea un lista para los DTO 
+				 List<InstructionDto> instructionsDto = new ArrayList<>();
+				 * 
+				 */
+				
+				try {
+					//Se obtienen todos los valores de la entidad 
+					//instructionsEntity = instructionRepository.findAll();
+					
+					instructionsEntity = instructionRepository.findByBuc(buc);
+					
+					//Se trata la exception si viene vacia la lista de la entidad 
+				}catch (Exception e) {
+					// TODO: handle exception
+					LOG.info("Error:"+e);
+					throw new PersistentException(HttpStatus.CONFLICT, PersistentDataCatalog.PSID001.getCode(),
+							PersistentDataCatalog.PSID001.getMessage(), LevelException.ERROR.toString(),
+							"No existen datos en la base de datos");
+				}
+				
+				for (Instruction entity : instructionsEntity) {
+					InstructionDto instructionDto = InstructionDto.builder()
+							.business(InstructionBusinessDto.builder()
+									.id(entity.getIdBusiness())
+									.build())
+							.file(InstructionsFileDto.builder()
+									.url(entity.getFileUrl())
+									.build())
+							.status(StatusDto.builder()
+									.description(entity.getStatus())
+									.cause(entity.getStatusCause())
+									.build())
+							.subBusiness(SubBusinessDto.builder()
+									.id(entity.getIdSubBusiness())
+									.build())
+							.typeInstruction(InstructionsTypeInstructionDto.builder()
+									.id(entity.getIdTypeInstruction())
+									.name(entity.getNameInstruction())
+									.build())
+							.build();
+					instructionsDto.add(instructionDto);
+				}
+				
+				instructionsResDto.builder()
+				.data(InstructionsDataDto.builder()
+						.instructions(instructionsDto)
+						.build())
+				.build();
+		
+		
+		return instructionsResDto;
 	}
 
 }

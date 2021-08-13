@@ -23,7 +23,7 @@ public class InstructionDto implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BusinessDto business;
+	private InstructionBusinessDto business;
 	private SubBusinessDto subBusiness;
 	private InstructionsFileDto file;
 	private InstructionsTypeInstructionDto typeInstruction;

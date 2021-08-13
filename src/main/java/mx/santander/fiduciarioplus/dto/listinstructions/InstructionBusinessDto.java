@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BusinessDto implements Serializable{
+public class InstructionBusinessDto implements Serializable{
 
     /**
 	 * 
