@@ -11,11 +11,15 @@ import javax.persistence.Table;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "TYPE_INSTRUCCION")
 public class Instruccion implements Serializable {
