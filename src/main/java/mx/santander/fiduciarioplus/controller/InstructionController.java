@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import mx.santander.fiduciarioplus.dto.listinstructions.InstructionsResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
 import mx.santander.fiduciarioplus.service.IInstructionService;
@@ -48,6 +49,17 @@ public class InstructionController {
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(dataSendInstructionResDto);
 	}
+	
+	@GetMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc) {
+		InstructionsResDto instructionsResDto = instructionService.getListInstructions(buc);
+		if(instructionsResDto == null) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(instructionsResDto);
+	}
+	
+	
 	/*Errores 
 	 * MissingServletRequestParameterException
 	 * MissingServletRequestPartException
