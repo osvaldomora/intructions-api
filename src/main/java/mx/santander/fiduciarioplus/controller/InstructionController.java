@@ -53,7 +53,7 @@ public class InstructionController {
 	@GetMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc) {
 		InstructionsResDto instructionsResDto = instructionService.getListInstructions(buc);
-		if(instructionsResDto == null) {
+		if(instructionsResDto.getData().getInstructions().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(instructionsResDto);
@@ -64,6 +64,7 @@ public class InstructionController {
 	 * MissingServletRequestParameterException
 	 * MissingServletRequestPartException
 	 * HttpMediaTypeNotSupportedException
+	 * MaxUploadSizeExceededException
 	 */
 	
 }

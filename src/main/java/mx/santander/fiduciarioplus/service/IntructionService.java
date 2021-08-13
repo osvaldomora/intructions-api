@@ -203,6 +203,10 @@ public class IntructionService implements IInstructionService{
 					//instructionsEntity = instructionRepository.findAll();
 					
 					instructionsEntity = instructionRepository.findByBuc(buc);
+					LOG.info("TAMAÑO INSTRUCTIONS ENTITY: "+instructionsEntity.size());
+					for(Instruction i : instructionsEntity) {
+						LOG.info(i.getBuc());
+					}
 					
 					//Se trata la exception si viene vacia la lista de la entidad 
 				}catch (Exception e) {
@@ -235,12 +239,13 @@ public class IntructionService implements IInstructionService{
 							.build();
 					instructionsDto.add(instructionDto);
 				}
+				LOG.info("TAMAÑO INSTRUCTIONS DTO: "+instructionsDto.size());
 				
-				instructionsResDto.builder()
-				.data(InstructionsDataDto.builder()
-						.instructions(instructionsDto)
-						.build())
-				.build();
+				instructionsResDto	=	InstructionsResDto.builder()
+											.data(InstructionsDataDto.builder()
+													.instructions(instructionsDto)
+													.build())
+											.build();
 		
 		
 		return instructionsResDto;
