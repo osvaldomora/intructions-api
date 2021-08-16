@@ -9,7 +9,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,13 +24,12 @@ import mx.santander.fiduciarioplus.dto.sendinstruction.request.FileDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.FolioDto;
-import mx.santander.fiduciarioplus.exception.BusinessException;
-import mx.santander.fiduciarioplus.exception.InvalidDataException;
-import mx.santander.fiduciarioplus.exception.PersistentException;
-import mx.santander.fiduciarioplus.exception.catalog.BusinessCatalog;
-import mx.santander.fiduciarioplus.exception.catalog.InvalidDataCatalog;
-import mx.santander.fiduciarioplus.exception.catalog.LevelException;
-import mx.santander.fiduciarioplus.exception.catalog.PersistentDataCatalog;
+import mx.santander.fiduciarioplus.lib.exception.catalog.BusinessCatalog;
+import mx.santander.fiduciarioplus.lib.exception.catalog.InvalidDataCatalog;
+import mx.santander.fiduciarioplus.lib.exception.catalog.PersistenDataCatalog;
+import mx.santander.fiduciarioplus.lib.exception.model.BusinessException;
+import mx.santander.fiduciarioplus.lib.exception.model.InvalidDataException;
+import mx.santander.fiduciarioplus.lib.exception.model.PersistenDataException;
 import mx.santander.fiduciarioplus.model.instruction.Instruction;
 import mx.santander.fiduciarioplus.model.sendinstruction.SendFIle;
 import mx.santander.fiduciarioplus.repository.IInstrucctionFIleRepository;
@@ -77,12 +75,7 @@ public class IntructionService implements IInstructionService{
 		//Se envia registro de Instruccion a BD y valida envio
 		Instruction sendInstructionEntityResult =  this.instructionRepository.save(sendInstructionEntity);
 		if(sendInstructionEntityResult == null) {
-			throw new PersistentException(HttpStatus.CONFLICT,
-						PersistentDataCatalog.PSID001.getCode(), 
-						PersistentDataCatalog.PSID001.getMessage(),
-						LevelException.ERROR.toString(), 
-						"Error en transaccion de guardar instruction.");
-					
+			throw new PersistenDataException(PersistenDataCatalog.PSID001, "Error en transaccion al guardar instruccion.");					
 		}
 		//Se genera respuesta de Folio
 		DataSendInstructionResDto dataSendInstructionResDto = DataSendInstructionResDto.builder()
@@ -90,7 +83,6 @@ public class IntructionService implements IInstructionService{
 																			(new FolioDto(sendInstructionEntityResult.getIdFolio(), sendInstructionEntityResult.getDate()))
 																		)
 																.build();		
-		// TODO Auto-generated method stub
 		return dataSendInstructionResDto;
 	}
 
@@ -123,11 +115,7 @@ public class IntructionService implements IInstructionService{
 			this.instrucctionFIleRepository.save(sendFIleEntity);
 			LOG.info("Se a enviado con exito el archivo: "+fileDto.getFileFullName());
 		} catch (IOException e) {	//Error al codificar archivo 
-			throw new InvalidDataException(HttpStatus.CONFLICT, 
-					InvalidDataCatalog.INVD002.getCode(),
-					InvalidDataCatalog.INVD002.getMessage(), 
-					LevelException.ERROR.toString(), 
-					"Error al codificar archivo.");
+			throw new InvalidDataException(InvalidDataCatalog.INVD002);
 		}
 		LOG.info("Archivo codificado base64: "+fileEncode64);
 		
@@ -141,44 +129,24 @@ public class IntructionService implements IInstructionService{
 		try {
 			 dataSendInstructionReqDto = mapper.readValue(sendInstructionJson, DataSendInstructionReqDto.class);
 		} catch (JsonProcessingException | IllegalArgumentException e) {	//Error al Mapear JSON a DTO
-			throw new InvalidDataException(HttpStatus.CONFLICT, 
-					InvalidDataCatalog.INVD001.getCode(),
-					InvalidDataCatalog.INVD001.getMessage(), 
-					LevelException.ERROR.toString(), 
-					"Error al mapear JSON");
+			throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error en la estructura del JSON de entrada.");
 		}
 		//El servicio solo admite un unico documento
 		LOG.info("Tamaño lista archivos: "+String.valueOf(files.size()));
 		LOG.info("Lista vacia: "+String.valueOf(files.isEmpty()));
 		if(files.size() > 1 ||  files.isEmpty()) {	//Se han enviado mas doumentos de los esperados
-			throw new BusinessException(HttpStatus.BAD_REQUEST,
-					BusinessCatalog.BUSI003.getCode(),
-					BusinessCatalog.BUSI003.getMessage(),
-					LevelException.ERROR.toString(),
-					"Se han enviado mas documentos de los esperados.");
+			throw new BusinessException(BusinessCatalog.BUSI003, "Se han enviado mas documentos de los esperados.");
 		}
 		for(MultipartFile file : files) {
 			LOG.info("Tamaño de archivo en KB: "+file.getSize());
 			if(file.getSize() > MAX_SIZE_FILE_BYTES) {	//Valida tamanio de archivo, tiene que se menor a 15MB
-				throw new BusinessException(HttpStatus.BAD_REQUEST,
-						BusinessCatalog.BUSI001.getCode(),
-						BusinessCatalog.BUSI001.getMessage(),
-						LevelException.ERROR.toString(),
-						"El archivo ha superado el limite de 15MB.");
+				throw new BusinessException(BusinessCatalog.BUSI001, "El archivo ha superado el limite de MB.");
 			}
 			if(!file.getOriginalFilename().split("\\.")[1].equalsIgnoreCase(ExtensionFile.PDF.toString())) {	//Valida tipo de archivo, disponible solo PDF
-				throw new BusinessException(HttpStatus.BAD_REQUEST,
-						BusinessCatalog.BUSI002.getCode(),
-						BusinessCatalog.BUSI002.getMessage(),
-						LevelException.ERROR.toString(),
-						"Formato aceptado: PDF.");
+				throw new BusinessException(BusinessCatalog.BUSI002, "Formato aceptado: " + ExtensionFile.PDF);
 			}
 			if(file.getSize() == 0) {	//Valida que el archivo no este vacio
-				throw new BusinessException(HttpStatus.BAD_REQUEST,
-											BusinessCatalog.BUSI001.getCode(),
-											BusinessCatalog.BUSI001.getMessage(),
-											LevelException.ERROR.toString(),
-											"El archivo no puede estar vacio");
+				throw new BusinessException(BusinessCatalog.BUSI001, "El archivo no puede estar vacio.");
 			}
 			//Enviar archivo
 			this.saveDocument(file);
@@ -218,9 +186,7 @@ public class IntructionService implements IInstructionService{
 				}catch (Exception e) {
 					// TODO: handle exception
 					LOG.info("Error:"+e);
-					throw new PersistentException(HttpStatus.CONFLICT, PersistentDataCatalog.PSID001.getCode(),
-							PersistentDataCatalog.PSID001.getMessage(), LevelException.ERROR.toString(),
-							"No existen datos en la base de datos");
+					throw new PersistenDataException(PersistenDataCatalog.PSID001);
 				}
 				
 				for (Instruction entity : instructionsEntity) {
@@ -247,7 +213,6 @@ public class IntructionService implements IInstructionService{
 									.date(formato.parse(entity.getDate()))
 									.build())
 							*/
-							
 							//.date(InstructionDto.builder().
 									//.date(new Date(fo))
 									//.date(new Date(entity.parse(getDate())))

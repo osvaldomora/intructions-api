@@ -9,7 +9,6 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
@@ -17,11 +16,10 @@ import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.FileDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstructionDto;
-import mx.santander.fiduciarioplus.exception.InvalidDataException;
-import mx.santander.fiduciarioplus.exception.PersistentException;
-import mx.santander.fiduciarioplus.exception.catalog.InvalidDataCatalog;
-import mx.santander.fiduciarioplus.exception.catalog.LevelException;
-import mx.santander.fiduciarioplus.exception.catalog.PersistentDataCatalog;
+import mx.santander.fiduciarioplus.lib.exception.catalog.InvalidDataCatalog;
+import mx.santander.fiduciarioplus.lib.exception.catalog.PersistenDataCatalog;
+import mx.santander.fiduciarioplus.lib.exception.model.InvalidDataException;
+import mx.santander.fiduciarioplus.lib.exception.model.PersistenDataException;
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
 import mx.santander.fiduciarioplus.repository.ITypeInstructionRepository;
 
@@ -41,12 +39,8 @@ public class TypeInstructionService implements ITypeInstructionService {
 		 instruccionEntity = typeInstructionRepository.findAll();
 		}catch (Exception e) {
 			LOG.info("error:"+e);
-			throw new PersistentException(HttpStatus.CONFLICT, PersistentDataCatalog.PSID001.getCode(),
-					PersistentDataCatalog.PSID001.getMessage(), LevelException.ERROR.toString(),
-					"No se encontraron datos en la base de datos.");
+			throw new PersistenDataException(PersistenDataCatalog.PSID001);		
 		}
-
-
 		try {
 			List<TypeInstructionDto> li = instruccionEntity.stream().map((insEntity) -> {
 
@@ -70,8 +64,7 @@ public class TypeInstructionService implements ITypeInstructionService {
 			dataTypeInstructionResDto = new DataTypeInstructionResDto(data);
 		} catch (Exception e) {
 			LOG.info("error"+e);
-			throw new InvalidDataException(HttpStatus.CONFLICT, InvalidDataCatalog.INVD001.getCode(),
-					InvalidDataCatalog.INVD001.getMessage(), LevelException.ERROR.toString(), "Error al mapear el DTO");
+			throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error al mapear DTO");
 		}
 		return dataTypeInstructionResDto;
 	}

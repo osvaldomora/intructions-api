@@ -47,7 +47,7 @@
 			<artifactId>h2</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
@@ -58,7 +58,12 @@
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
 		</dependency>
-
+		<!-- Libreria interna de excepciones -->
+		<dependency>
+			<groupId>mx.santander.fiduciarioplus.lib.exception</groupId>
+			<artifactId>exception-library-lib</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
 	</dependencies>
 
