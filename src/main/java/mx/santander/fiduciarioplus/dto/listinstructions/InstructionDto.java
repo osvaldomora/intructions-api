@@ -2,6 +2,7 @@
 package mx.santander.fiduciarioplus.dto.listinstructions;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.annotation.Generated;
 
@@ -28,6 +29,6 @@ public class InstructionDto implements Serializable{
 	private InstructionsFileDto file;
 	private InstructionsTypeInstructionDto typeInstruction;
 	private StatusDto status;
-	private String date;
+	private Date date;
 
 }

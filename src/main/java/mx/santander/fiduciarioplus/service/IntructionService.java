@@ -1,7 +1,9 @@
 package mx.santander.fiduciarioplus.service;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ import mx.santander.fiduciarioplus.repository.IInstructionRepository;
 import mx.santander.fiduciarioplus.util.FileEncoder;
 import mx.santander.fiduciarioplus.util.FolioRandom;
 
+//import java.util.Date;
+
 @Service
 public class IntructionService implements IInstructionService{
 	
@@ -49,6 +53,9 @@ public class IntructionService implements IInstructionService{
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	private final Long MAX_SIZE_FILE_BYTES = 15728640L;
+	
+	SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	//Date fechaActual = new Date();
 
 	@Override
 	public DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstructionDto) {
@@ -201,7 +208,6 @@ public class IntructionService implements IInstructionService{
 				try {
 					//Se obtienen todos los valores de la entidad 
 					//instructionsEntity = instructionRepository.findAll();
-					
 					instructionsEntity = instructionRepository.findByBuc(buc);
 					LOG.info("TAMAÑO INSTRUCTIONS ENTITY: "+instructionsEntity.size());
 					for(Instruction i : instructionsEntity) {
@@ -236,6 +242,13 @@ public class IntructionService implements IInstructionService{
 									.id(entity.getIdTypeInstruction())
 									.name(entity.getNameInstruction())
 									.build())
+							.date(InstructionDto.builder()
+									.date(formato.parse(entity.getDate()))
+									.build())
+							//.date(InstructionDto.builder().
+									//.date(new Date(fo))
+									//.date(new Date(entity.parse(getDate())))
+									//.build())
 							.build();
 					instructionsDto.add(instructionDto);
 				}
