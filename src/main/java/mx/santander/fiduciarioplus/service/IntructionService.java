@@ -242,9 +242,12 @@ public class IntructionService implements IInstructionService{
 									.id(entity.getIdTypeInstruction())
 									.name(entity.getNameInstruction())
 									.build())
+							/*
 							.date(InstructionDto.builder()
 									.date(formato.parse(entity.getDate()))
 									.build())
+							*/
+							
 							//.date(InstructionDto.builder().
 									//.date(new Date(fo))
 									//.date(new Date(entity.parse(getDate())))
