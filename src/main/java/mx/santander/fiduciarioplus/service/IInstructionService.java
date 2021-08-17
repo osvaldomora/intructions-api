@@ -1,6 +1,7 @@
 package mx.santander.fiduciarioplus.service;
 
 import java.util.List;
+import java.text.ParseException;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,5 +13,5 @@ public interface IInstructionService {
 	DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstruction);
 	void saveDocument (MultipartFile file);
 	DataSendInstructionResDto save (String sendInstructionJson, List<MultipartFile> files);
-	InstructionsResDto getListInstructions(String buc);
+	InstructionsResDto getListInstructions(String buc) throws ParseException;
 }

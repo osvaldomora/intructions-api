@@ -1,6 +1,7 @@
 package mx.santander.fiduciarioplus.controller;
 
 import java.util.List;
+import java.text.ParseException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class InstructionController {
 	}
 	
 	@GetMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc) {
+	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc) throws ParseException{
 		InstructionsResDto instructionsResDto = instructionService.getListInstructions(buc);
 		if(instructionsResDto.getData().getInstructions().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

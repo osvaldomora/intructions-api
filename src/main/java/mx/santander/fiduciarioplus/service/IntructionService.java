@@ -1,6 +1,7 @@
 package mx.santander.fiduciarioplus.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -156,8 +157,12 @@ public class IntructionService implements IInstructionService{
 	}
 
 	@Override
-	public InstructionsResDto getListInstructions(String buc) {
+	public InstructionsResDto getListInstructions(String buc) throws ParseException {
 		// TODO Auto-generated method stub
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date dateA = new Date();
+
+		
 		//Se crea el objeto de instructionsResDto
 				InstructionsResDto instructionsResDto = null;
 				//Se crea una lista de la entidad
@@ -208,6 +213,7 @@ public class IntructionService implements IInstructionService{
 									.id(entity.getIdTypeInstruction())
 									.name(entity.getNameInstruction())
 									.build())
+							.date(format.parse(entity.getDate().toString()))
 							/*
 							.date(InstructionDto.builder()
 									.date(formato.parse(entity.getDate()))
