@@ -104,7 +104,7 @@ public class IntructionService implements IInstructionService{
 						.size(file.getSize())
 						.fileBase64(fileEncode64)
 						.build();
-			LOG.info("FileDto: "+fileDto.toString());
+			LOG.info("FileDto: "+fileDto.getFileFullName() +" size: "+fileDto.getSize());
 			//Se hace map de DTO a Entity
 			sendFIleEntity = SendFIle.builder()
 							.fileFullName(fileDto.getFileFullName())
