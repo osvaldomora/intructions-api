@@ -17,6 +17,6 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DataSendInstructionResDto implements Serializable{
 
-	public DataDto dataDto;
+	public DataDto data;
 	private static final long serialVersionUID = 1L;
 }

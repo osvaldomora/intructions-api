@@ -16,10 +16,10 @@ import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.FileDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstructionDto;
-import mx.santander.fiduciarioplus.lib.exception.catalog.InvalidDataCatalog;
-import mx.santander.fiduciarioplus.lib.exception.catalog.PersistenDataCatalog;
-import mx.santander.fiduciarioplus.lib.exception.model.InvalidDataException;
-import mx.santander.fiduciarioplus.lib.exception.model.PersistenDataException;
+import mx.santander.fiduciarioplus.exception.catalog.InvalidDataCatalog;
+import mx.santander.fiduciarioplus.exception.catalog.PersistenDataCatalog;
+import mx.santander.fiduciarioplus.exception.model.InvalidDataException;
+import mx.santander.fiduciarioplus.exception.model.PersistenDataException;
 import mx.santander.fiduciarioplus.model.typeinstruction.Instruccion;
 import mx.santander.fiduciarioplus.repository.ITypeInstructionRepository;
 

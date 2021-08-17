@@ -25,12 +25,12 @@ import mx.santander.fiduciarioplus.dto.sendinstruction.request.FileDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.FolioDto;
-import mx.santander.fiduciarioplus.lib.exception.catalog.BusinessCatalog;
-import mx.santander.fiduciarioplus.lib.exception.catalog.InvalidDataCatalog;
-import mx.santander.fiduciarioplus.lib.exception.catalog.PersistenDataCatalog;
-import mx.santander.fiduciarioplus.lib.exception.model.BusinessException;
-import mx.santander.fiduciarioplus.lib.exception.model.InvalidDataException;
-import mx.santander.fiduciarioplus.lib.exception.model.PersistenDataException;
+import mx.santander.fiduciarioplus.exception.catalog.BusinessCatalog;
+import mx.santander.fiduciarioplus.exception.catalog.InvalidDataCatalog;
+import mx.santander.fiduciarioplus.exception.catalog.PersistenDataCatalog;
+import mx.santander.fiduciarioplus.exception.model.BusinessException;
+import mx.santander.fiduciarioplus.exception.model.InvalidDataException;
+import mx.santander.fiduciarioplus.exception.model.PersistenDataException;
 import mx.santander.fiduciarioplus.model.instruction.Instruction;
 import mx.santander.fiduciarioplus.model.sendinstruction.SendFIle;
 import mx.santander.fiduciarioplus.repository.IInstrucctionFIleRepository;
@@ -80,7 +80,7 @@ public class IntructionService implements IInstructionService{
 		}
 		//Se genera respuesta de Folio
 		DataSendInstructionResDto dataSendInstructionResDto = DataSendInstructionResDto.builder()
-																.dataDto(new DataDto
+																.data(new DataDto
 																			(new FolioDto(sendInstructionEntityResult.getIdFolio(), sendInstructionEntityResult.getDate()))
 																		)
 																.build();		
