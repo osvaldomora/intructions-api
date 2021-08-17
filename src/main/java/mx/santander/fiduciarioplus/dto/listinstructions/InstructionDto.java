@@ -4,8 +4,6 @@ package mx.santander.fiduciarioplus.dto.listinstructions;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.annotation.Generated;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;

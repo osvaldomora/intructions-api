@@ -35,7 +35,7 @@ public class Instruction {
 	@Column(name = "TOKEN_BUC")
 	private String token;
 	
-	@Column(name = "DATE")
+	@Column(name = "DATE_INSTRUCTION")
 	private Date date;
 	
 	@Column(name = "ID_TYPE_INSTRUCTION")
