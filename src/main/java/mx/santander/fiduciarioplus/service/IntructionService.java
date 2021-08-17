@@ -60,7 +60,7 @@ public class IntructionService implements IInstructionService{
 	public DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstructionDto) {
 		Instruction sendInstructionEntity = null;
 		String folioRandom = FolioRandom.getRandomFolio();
-		LOG.info("SendInstruction: "+sendInstructionDto.toString());
+		LOG.info("SendInstructionDto: "+sendInstructionDto.toString());
 		sendInstructionEntity = Instruction.builder()
 							.buc(sendInstructionDto.getBuc().getId())
 							.token(sendInstructionDto.getBuc().getToken())
@@ -75,6 +75,7 @@ public class IntructionService implements IInstructionService{
 							.build();
 		//Se envia registro de Instruccion a BD y valida envio
 		Instruction sendInstructionEntityResult =  this.instructionRepository.save(sendInstructionEntity);
+		LOG.info("Se a enviado con exito la Instruccion: "+sendInstructionEntity.toString());
 		if(sendInstructionEntityResult == null) {
 			throw new PersistenDataException(PersistenDataCatalog.PSID001, "Error en transaccion al guardar instruccion.");					
 		}
@@ -118,8 +119,6 @@ public class IntructionService implements IInstructionService{
 		} catch (IOException e) {	//Error al codificar archivo 
 			throw new InvalidDataException(InvalidDataCatalog.INVD002);
 		}
-		LOG.info("Archivo codificado base64: "+fileEncode64);
-		
 	}
 
 	@Override
@@ -133,8 +132,6 @@ public class IntructionService implements IInstructionService{
 			throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error en la estructura del JSON de entrada.");
 		}
 		//El servicio solo admite un unico documento
-		LOG.info("Tamaño lista archivos: "+String.valueOf(files.size()));
-		LOG.info("Lista vacia: "+String.valueOf(files.isEmpty()));
 		if(files.size() > 1 ||  files.isEmpty()) {	//Se han enviado mas doumentos de los esperados
 			throw new BusinessException(BusinessCatalog.BUSI003, "Se han enviado mas documentos de los esperados.");
 		}
@@ -181,12 +178,7 @@ public class IntructionService implements IInstructionService{
 				try {
 					//Se obtienen todos los valores de la entidad 
 					//instructionsEntity = instructionRepository.findAll();
-					instructionsEntity = instructionRepository.findByBuc(buc);
-					LOG.info("TAMAÑO INSTRUCTIONS ENTITY: "+instructionsEntity.size());
-					for(Instruction i : instructionsEntity) {
-						LOG.info(i.getIdInstruction().toString());
-					}
-					
+					instructionsEntity = instructionRepository.findByBuc(buc);					
 					//Se trata la exception si viene vacia la lista de la entidad 
 				}catch (Exception e) {
 					// TODO: handle exception
@@ -233,7 +225,7 @@ public class IntructionService implements IInstructionService{
 													.instructions(instructionsDto)
 													.build())
 											.build();
-		
+				LOG.info("LIST INSTRUCTIONS DTO: "+instructionsDto.toString());
 		
 		return instructionsResDto;
 	}
