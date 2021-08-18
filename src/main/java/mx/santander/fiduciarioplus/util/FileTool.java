@@ -5,7 +5,7 @@ import java.util.Base64;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileEncoder {
+public class FileTool {
 
 	public static String encode64(MultipartFile file) throws IOException {
 		StringBuffer fileEncode = new StringBuffer();
@@ -15,6 +15,12 @@ public class FileEncoder {
 		fileEncode.append(encodeBytes);
 
 		return fileEncode.toString();
+	}
+	
+	public static String getFileExtension(String fullNameFile) {
+		String extension = "";
+		extension = fullNameFile.substring(fullNameFile.indexOf(".")+1);
+		return extension;
 	}
 
 }
