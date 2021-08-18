@@ -4,6 +4,7 @@ package mx.santander.fiduciarioplus.dto.typeinstruction;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class FileDto implements Serializable
 	
 
 	private static final long serialVersionUID = -6655732514322381748L;
+	@JsonProperty("id")
 	private IdFile fileId;
     private String fileName;
     private  RequiredFile requiredFile ;

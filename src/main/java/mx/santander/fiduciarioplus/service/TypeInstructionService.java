@@ -1,7 +1,6 @@
 package mx.santander.fiduciarioplus.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,10 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
-import mx.santander.fiduciarioplus.dto.typeinstruction.FileDto;
 import mx.santander.fiduciarioplus.dto.typeinstruction.TypeInstructionDto;
 import mx.santander.fiduciarioplus.exception.catalog.InvalidDataCatalog;
 import mx.santander.fiduciarioplus.exception.catalog.PersistenDataCatalog;
@@ -45,6 +42,9 @@ public class TypeInstructionService implements ITypeInstructionService {
 			List<TypeInstructionDto> li = instruccionEntity.stream().map((insEntity) -> {
 
 				TypeInstructionDto typeInstruction = MODELMAPPER.map(insEntity, TypeInstructionDto.class);
+				typeInstruction.setFiles(new ArrayList<>());
+				
+				/*
 				FileDto file = MODELMAPPER.map(insEntity, FileDto.class);
 				if(insEntity.getId()==1 ||insEntity.getId()==3 || insEntity.getId()==5)
 					typeInstruction.setFiles(new ArrayList<>());
@@ -55,7 +55,7 @@ public class TypeInstructionService implements ITypeInstructionService {
 				{if (insEntity.getFileId().equalsIgnoreCase("pdf")) {
 					file.setExtensionFile(ExtensionFile.PDF);
 				} else
-					file.setExtensionFile(ExtensionFile.TXT);}
+					file.setExtensionFile(ExtensionFile.TXT);}  */
 				return typeInstruction;
 			}).collect(Collectors.toList());
 

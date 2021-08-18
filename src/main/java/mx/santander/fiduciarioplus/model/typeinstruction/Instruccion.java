@@ -40,14 +40,14 @@ public class Instruccion implements Serializable {
 	@Column(name = "TIPO_DE_INSTRUCCION")
 	private String name;
 	
-	@Column(name = "ID_DOCUMENTO")
-	private String fileId;
-	
 	@Column(name = "NOMBRE_DOCUMENTO")
 	private String fileName;
 	
-	@Column(name = "REQUERIDO")
-	private String required;
+	@Column(name = "ID_DOCUMENTO")
+	private String fileId;
+	
+//	@Column(name = "REQUERIDO")
+//	private String required;
 	
 
  
