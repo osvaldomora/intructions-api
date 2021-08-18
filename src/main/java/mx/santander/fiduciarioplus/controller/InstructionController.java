@@ -52,14 +52,15 @@ public class InstructionController {
 	}
 	
 	@GetMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc) throws ParseException{
-		InstructionsResDto instructionsResDto = instructionService.getListInstructions(buc);
+	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc,
+											  @RequestParam(name = "business.id", required = true)String businessId,
+											  @RequestParam(name = "subBusiness.id", required = true)String subBusinessId) throws ParseException{
+		InstructionsResDto instructionsResDto = instructionService.getListInstructions(buc,businessId,subBusinessId);
 		if(instructionsResDto.getData().getInstructions().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(instructionsResDto);
 	}
-	
 	
 	/*Errores 
 	 * MissingServletRequestParameterException

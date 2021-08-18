@@ -10,7 +10,7 @@ import mx.santander.fiduciarioplus.model.instruction.Instruction;
 @Repository
 public interface IInstructionRepository extends JpaRepository<Instruction, Long>{
 
-	List<Instruction> findByBuc(String buc);
+	List<Instruction> findByBucAndIdBusinessAndIdSubBusiness(String buc, String business, String subBusiness);
 
 	
 }

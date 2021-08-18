@@ -159,7 +159,7 @@ public class IntructionService implements IInstructionService{
 	}
 
 	@Override
-	public InstructionsResDto getListInstructions(String buc) throws ParseException {
+	public InstructionsResDto getListInstructions(String buc, String business, String subBusiness) throws ParseException {
 		// TODO Auto-generated method stub
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date dateA = new Date();
@@ -183,7 +183,7 @@ public class IntructionService implements IInstructionService{
 				try {
 					//Se obtienen todos los valores de la entidad 
 					//instructionsEntity = instructionRepository.findAll();
-					instructionsEntity = instructionRepository.findByBuc(buc);					
+					instructionsEntity = instructionRepository.findByBucAndIdBusinessAndIdSubBusiness(buc, business, subBusiness);					
 					//Se trata la exception si viene vacia la lista de la entidad 
 				}catch (Exception e) {
 					// TODO: handle exception
