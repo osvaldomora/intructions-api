@@ -2,10 +2,14 @@ package mx.santander.fiduciarioplus.exception;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MissingRequestValueException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -44,7 +48,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return Respuesta basada en el catalogo de excepciones
 	 */
 	@ExceptionHandler(MaxUploadSizeExceededException.class)
-	protected ResponseEntity<?> handleExceptionSizeFile(Exception ex,  HttpServletRequest request) {
+	public ResponseEntity<?> handleExceptionSizeFile(Exception ex,  HttpServletRequest request) {
 		ErrorResponse errorResponse = new ErrorResponse(BusinessCatalog.BUSI001.getCode(), 
 				BusinessCatalog.BUSI001.getMessage(), 
 				BusinessCatalog.BUSI001.getLevelException().toString(), 
@@ -57,22 +61,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @param request Informacion del request enviado
 	 * @return Respuesta basada en el catalogo de excepciones
 	 */
-	@ExceptionHandler({MissingRequestValueException.class})
-	protected ResponseEntity<?> handleExceptionRequest(Exception ex,  HttpServletRequest request) {
+	@Override
+	protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		ErrorResponse errorResponse = new ErrorResponse(GeneralCatalog.GRAL002.getCode(), 
 				GeneralCatalog.GRAL002.getMessage(), 
 				GeneralCatalog.GRAL002.getLevelException().toString(), 
-				request.getRequestURL().toString());	
+				((ServletWebRequest)request).getRequest().getRequestURI());	
 		return ResponseEntity.status(GeneralCatalog.GRAL002.getHtttpStatus()).body(errorResponse);
 	}
-
+	
 	/**
 	 * @param ex Modelo de la excepcion recibida, controla excepciones generales
 	 * @param request Informacion del request enviado
 	 * @return Respuesta basada en el catalogo de excepciones
 	 */
 	@ExceptionHandler(Exception.class)
-	protected ResponseEntity<?> handleExceptionGeneric(Exception ex,  HttpServletRequest request) {
+	public ResponseEntity<?> handleExceptionGeneric(Exception ex,  HttpServletRequest request) {
 		ErrorResponse errorResponse = new ErrorResponse(GeneralCatalog.GRAL001.getCode(), 
 				GeneralCatalog.GRAL001.getMessage(), 
 				GeneralCatalog.GRAL001.getLevelException().toString(),
@@ -80,5 +85,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				request.getRequestURL().toString());
 		return ResponseEntity.status(GeneralCatalog.GRAL001.getHtttpStatus()).body(errorResponse);
 	}
+
+
 
 }

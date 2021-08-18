@@ -138,7 +138,6 @@ public class IntructionService implements IInstructionService{
 		}
 		for(MultipartFile file : files) {
 			Long fileSize = file.getSize();
-			String fileExtension = FileTool.getFileExtension(file.getOriginalFilename());
 			if(fileSize > MAX_SIZE_FILE_BYTES) {	//Valida tamanio de archivo, tiene que se menor a 15MB
 				LOG.warn("WARN: BUSI.001, TAMAÑO ARCHIVO: "+file.getSize());
 				throw new BusinessException(BusinessCatalog.BUSI001, "El archivo ha superado el limite de MB.");
@@ -147,8 +146,8 @@ public class IntructionService implements IInstructionService{
 				LOG.warn("WARD: BUSI.001, TAMAÑO ARCHIVO: "+file.getSize());
 				throw new BusinessException(BusinessCatalog.BUSI001, "El archivo no puede estar vacio.");
 			}
-			if(fileExtension.equalsIgnoreCase(ExtensionFile.PDF.toString())) {	//Valida tipo de archivo, disponible solo PDF
-				LOG.warn("WARN: BUSI.002, FORMATO ARCHIVO: "+fileExtension);
+			if(!file.getContentType().equalsIgnoreCase("application/pdf")) {	//Valida tipo de archivo, disponible solo PDF
+				LOG.warn("WARN: BUSI.002, FORMATO ARCHIVO: "+file.getContentType());
 				throw new BusinessException(BusinessCatalog.BUSI002, "Formato aceptado: " + ExtensionFile.PDF);
 			}
 			//Enviar archivo
