@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,7 +160,7 @@ public class IntructionService implements IInstructionService{
 	}
 
 	@Override
-	public InstructionsResDto getListInstructions(String buc, String business, String subBusiness) throws ParseException {
+	public InstructionsResDto getListInstructions(String buc, Integer business, Integer subBusiness) throws ParseException {
 		// TODO Auto-generated method stub
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date dateA = new Date();
@@ -222,6 +224,10 @@ public class IntructionService implements IInstructionService{
 							.build();
 					instructionsDto.add(instructionDto);
 				}
+				
+				//Se ordena por fecha ascendente
+				instructionsDto = instructionsDto.stream().sorted((inst1, inst2) -> inst2.getDate().compareTo(inst1.getDate())).collect(Collectors.toList());
+				
 				LOG.info("TAMAÑO INSTRUCTIONS DTO: "+instructionsDto.size());
 				
 				instructionsResDto	=	InstructionsResDto.builder()

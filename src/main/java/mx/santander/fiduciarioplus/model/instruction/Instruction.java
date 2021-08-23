@@ -45,10 +45,10 @@ public class Instruction {
 	private String nameInstruction;
 	
 	@Column(name = "ID_BUSINESS")
-	private String idBusiness;
+	private Integer idBusiness;
 	
 	@Column(name = "ID_SUB_BUSINESS")
-	private String idSubBusiness;
+	private Integer idSubBusiness;
 	
 	@Column(name = "STATUS_INSTRUCTION")
 	private String status;

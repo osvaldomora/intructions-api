@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SubBusinessDto implements Serializable{
 
-	private String id;
+	private Integer id;
 
 	private static final long serialVersionUID = 1L;
 }

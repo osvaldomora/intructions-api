@@ -13,5 +13,5 @@ public interface IInstructionService {
 	DataSendInstructionResDto saveInstruction(DataSendInstructionReqDto sendInstruction);
 	void saveDocument (MultipartFile file);
 	DataSendInstructionResDto save (String sendInstructionJson, List<MultipartFile> files);
-	InstructionsResDto getListInstructions(String buc, String business, String subBusiness) throws ParseException;
+	InstructionsResDto getListInstructions(String buc, Integer business, Integer subBusiness) throws ParseException;
 }

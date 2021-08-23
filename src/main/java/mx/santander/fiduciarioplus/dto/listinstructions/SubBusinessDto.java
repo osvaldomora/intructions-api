@@ -25,6 +25,6 @@ public class SubBusinessDto implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String id;
+	private Integer id;
 
 }
