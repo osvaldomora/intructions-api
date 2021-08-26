@@ -18,6 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsDataDto;
+import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsResDto;
+import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsStatusDto;
 import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
 import mx.santander.fiduciarioplus.dto.enums.StatusInstruction;
 import mx.santander.fiduciarioplus.dto.listinstructions.*;
@@ -238,6 +241,45 @@ public class IntructionService implements IInstructionService{
 				LOG.info("LIST INSTRUCTIONS DTO: "+instructionsDto.toString());
 		
 		return instructionsResDto;
+	}
+
+	@Override
+	public CountInstructionsResDto getListCountInstructions(String buc) {
+		// TODO Auto-generated method stub
+		
+		CountInstructionsResDto countInstructionsResDto = null;
+		List<Instruction> instructionsEntity = null;
+		List<CountInstructionsDataDto> countInstructionsDataDto = null;
+		
+
+		try {
+			instructionsEntity = instructionRepository.findByBuc(buc);
+			System.out.println("Hola 1: "+instructionsEntity.size());
+			
+			for (Instruction entity : instructionsEntity) {
+				LOG.info("HOLA 2: "+ entity.toString());
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
+			LOG.error("Error:"+e);
+			throw new PersistenDataException(PersistenDataCatalog.PSID001);
+		}
+		
+		CountInstructionsDataDto countInstructionDataDto = new CountInstructionsDataDto();
+		countInstructionDataDto.setBuc((Integer.parseInt(instructionsEntity.get(0).getBuc())));
+		
+		
+		for (Instruction entity : instructionsEntity) {
+			
+		}
+		
+		/*
+		countInstructionsResDto = CountInstructionsResDto.builder()
+				.data(CountInstructionsResDto.builder()
+						.)
+		*/
+		
+		return countInstructionsResDto;
 	}
 
 }

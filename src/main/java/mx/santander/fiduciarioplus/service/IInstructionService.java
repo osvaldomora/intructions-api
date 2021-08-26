@@ -5,6 +5,7 @@ import java.text.ParseException;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsResDto;
 import mx.santander.fiduciarioplus.dto.listinstructions.InstructionsResDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.request.DataSendInstructionReqDto;
 import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
@@ -14,4 +15,6 @@ public interface IInstructionService {
 	void saveDocument (MultipartFile file);
 	DataSendInstructionResDto save (String sendInstructionJson, List<MultipartFile> files);
 	InstructionsResDto getListInstructions(String buc, Integer business, Integer subBusiness) throws ParseException;
+	CountInstructionsResDto getListCountInstructions(String buc);
+	
 }
