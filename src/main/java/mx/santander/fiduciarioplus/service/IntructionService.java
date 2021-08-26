@@ -197,6 +197,7 @@ public class IntructionService implements IInstructionService{
 				
 				for (Instruction entity : instructionsEntity) {
 					InstructionDto instructionDto = InstructionDto.builder()
+							.folio(entity.getIdFolio())
 							.business(InstructionBusinessDto.builder()
 									.id(entity.getIdBusiness())
 									.build())
@@ -213,6 +214,7 @@ public class IntructionService implements IInstructionService{
 							.typeInstruction(InstructionsTypeInstructionDto.builder()
 									.id(entity.getIdTypeInstruction())
 									.name(entity.getNameInstruction())
+									.authorization(false) //Se agrega como false, ya que el negocio ahorita se necesita asi
 									.build())
 							.date(format.parse(entity.getDate().toString()))
 							/*
