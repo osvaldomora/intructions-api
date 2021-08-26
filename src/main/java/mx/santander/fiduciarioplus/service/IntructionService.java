@@ -74,6 +74,7 @@ public class IntructionService implements IInstructionService{
 							.idBusiness(sendInstructionDto.getBusiness().getId())
 							.idSubBusiness(sendInstructionDto.getBusiness().getSubBusiness().getId())
 							.status(StatusInstruction.SOLICITADA.toString())	//Se agrega por defaul al crear instrucction
+							.statusCause("Sin motivo")	//Se agrega por default motivo al crear
 							.fileUrl("http://localhost") //Se agrega por defaul al crear instrucction
 							.idFolio(folioRandom)
 							.build();
