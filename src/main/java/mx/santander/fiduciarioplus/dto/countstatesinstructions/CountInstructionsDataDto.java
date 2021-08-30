@@ -27,9 +27,10 @@ public class CountInstructionsDataDto implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Integer buc;
+	private String buc;
 	private Integer business;
 	private Integer subBusiness;
+	@Builder.Default 
 	private List<CountInstructionsStatusDto> status = new ArrayList<>();
 	private CountInstructionsDatesDto dates;
 
