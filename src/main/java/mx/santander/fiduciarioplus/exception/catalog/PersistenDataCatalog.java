@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum PersistenDataCatalog {
 	
 	PSID001("PersistentDataException","PSID.001","Error al realizar la transaccion.",HttpStatus.CONFLICT,LevelException.ERROR),
-	PSID002("PersistentDataException","PSID.002","Error de conexion en origen de datos.",HttpStatus.CONFLICT,LevelException.ERROR);
+	PSID002("PersistentDataException","PSID.002","Error de conexion en origen de datos.",HttpStatus.CONFLICT,LevelException.ERROR),
+	PSID003("PersistentDataException","PSID.003","Recurso no encontrado",HttpStatus.BAD_REQUEST,LevelException.ERROR);
 	
 	private final String type;
 	private final String code;
