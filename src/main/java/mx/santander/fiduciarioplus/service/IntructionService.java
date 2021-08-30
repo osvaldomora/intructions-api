@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsDataDto;
+import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsDatesDto;
 import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsResDto;
 import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsStatusDto;
 import mx.santander.fiduciarioplus.dto.enums.ExtensionFile;
@@ -247,42 +249,125 @@ public class IntructionService implements IInstructionService{
 	}
 
 	@Override
-	public CountInstructionsResDto getListCountInstructions(String buc) {
+	public CountInstructionsResDto getListCountInstructions(String buc,Integer business, Integer subBusiness) {
 		// TODO Auto-generated method stub
+		
+		int arregloContadorStatus[] = new int [5];
+		Integer auxBusiness=null;
+		Integer auxSubBusiness=null;
+		
 		
 		CountInstructionsResDto countInstructionsResDto = null;
 		List<Instruction> instructionsEntity = null;
-		List<CountInstructionsDataDto> countInstructionsDataDto = null;
+		List<CountInstructionsStatusDto> countInstructionsStatusDto = new ArrayList<>();
 		
-
+		
+		
 		try {
-			instructionsEntity = instructionRepository.findByBuc(buc);
+			
+			if(business==null && subBusiness==null) {
+				instructionsEntity = instructionRepository.findByBuc(buc);
+			}else {
+				instructionsEntity = instructionRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(buc,business,subBusiness);
+				auxBusiness=business;
+				auxSubBusiness=subBusiness;
+			}
+			
+			
+			
 			System.out.println("Hola 1: "+instructionsEntity.size());
+			
+			if(instructionsEntity.isEmpty()) {
+				LOG.info("Se encuentra vacio");
+				throw new PersistenDataException(PersistenDataCatalog.PSID001);
+			}
 			
 			for (Instruction entity : instructionsEntity) {
 				LOG.info("HOLA 2: "+ entity.toString());
+				
+				switch (entity.getStatus()) {
+				case "SOLICITADA":
+						arregloContadorStatus[0]+=1;
+					break;
+				case "ENTREGADA":
+						arregloContadorStatus[1]+=1;
+					break;
+				case "PROCESO":
+						arregloContadorStatus[2]+=1;
+					break;
+				case "ATENDIA":
+						arregloContadorStatus[3]+=1;
+					break;
+				case "RECHAZADA":
+						arregloContadorStatus[4]+=1;
+					break;
+				}
 			}
+			
+			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+					.id(StatusInstruction.SOLICITADA.getId())
+					.description(StatusInstruction.SOLICITADA.toString())
+					.quantity(arregloContadorStatus[0]).build());
+			
+			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+					.id(StatusInstruction.ENTREGADA.getId())
+					.description(StatusInstruction.ENTREGADA.toString())
+					.quantity(arregloContadorStatus[1]).build());
+			
+
+			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+					.id(StatusInstruction.PROCESO.getId())
+					.description(StatusInstruction.PROCESO.toString())
+					.quantity(arregloContadorStatus[2]).build());
+			
+			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+					.id(StatusInstruction.ATENDIDA.getId())
+					.description(StatusInstruction.ATENDIDA.toString())
+					.quantity(arregloContadorStatus[3]).build());
+			
+			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+					.id(StatusInstruction.RECHAZADA.getId())
+					.description(StatusInstruction.RECHAZADA.toString())
+					.quantity(arregloContadorStatus[4]).build());
+			
+			
 		}catch (Exception e) {
 			// TODO: handle exception
-			LOG.error("Error:"+e);
-			throw new PersistenDataException(PersistenDataCatalog.PSID001);
-		}
-		
-		CountInstructionsDataDto countInstructionDataDto = new CountInstructionsDataDto();
-		countInstructionDataDto.setBuc((Integer.parseInt(instructionsEntity.get(0).getBuc())));
-		
-		
-		for (Instruction entity : instructionsEntity) {
+			LOG.error("Error:"+e.getMessage());
 			
+			if(business != null ) {
+				
+				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere subBusiness.id, para realizar una búsqueda completa");
+			}else if(subBusiness != null ) {
+				
+				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere business.id, para realizar una búsqueda completa");
+			}
+				
+				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Error al listar countstatus, no se encuntra el recurso");
+
 		}
 		
-		/*
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(calendar.DATE, -7);
+		
 		countInstructionsResDto = CountInstructionsResDto.builder()
-				.data(CountInstructionsResDto.builder()
-						.)
-		*/
+				.data(CountInstructionsDataDto.builder()
+						.buc(instructionsEntity.get(0).getBuc().toString())
+						.business(auxBusiness)
+						.subBusiness(auxSubBusiness)
+						.status(countInstructionsStatusDto)
+						.dates(CountInstructionsDatesDto.builder()
+								.start(calendar.getTime())
+								.end(new Date())
+								.build())
+						.build())
+				.build();
 		
 		return countInstructionsResDto;
 	}
+	
+	
+	
 
 }

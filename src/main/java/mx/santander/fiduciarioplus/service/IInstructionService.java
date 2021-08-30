@@ -15,6 +15,6 @@ public interface IInstructionService {
 	void saveDocument (MultipartFile file);
 	DataSendInstructionResDto save (String sendInstructionJson, List<MultipartFile> files);
 	InstructionsResDto getListInstructions(String buc, Integer business, Integer subBusiness) throws ParseException;
-	CountInstructionsResDto getListCountInstructions(String buc);
+	CountInstructionsResDto getListCountInstructions(String buc, Integer business, Integer subBusiness);
 	
 }
