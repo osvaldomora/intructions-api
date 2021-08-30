@@ -261,26 +261,27 @@ public class IntructionService implements IInstructionService{
 		List<Instruction> instructionsEntity = null;
 		List<CountInstructionsStatusDto> countInstructionsStatusDto = new ArrayList<>();
 		
-		
-		
-		try {
 			
 			if(business==null && subBusiness==null) {
 				instructionsEntity = instructionRepository.findByBuc(buc);
 			}else {
+				if(subBusiness == null ) {	//Arroja error si no se envia el subBusiness.id, no se puede generar consulta sin este dato				
+					throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere subBusiness.id, para realizar una búsqueda completa");
+				}
+				if(business == null ) {	//Arroja error si no se envia el  business.id, no se puede generar consulta sin este dato	
+					throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere business.id, para realizar una búsqueda completa");
+				}
 				instructionsEntity = instructionRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(buc,business,subBusiness);
 				auxBusiness=business;
 				auxSubBusiness=subBusiness;
 			}
 			
-			
-			
-			System.out.println("Hola 1: "+instructionsEntity.size());
-			
-			if(instructionsEntity.isEmpty()) {
-				LOG.info("Se encuentra vacio");
-				throw new PersistenDataException(PersistenDataCatalog.PSID001);
+			LOG.info("Tamaño de instructionsEntity_countStatus: {}",instructionsEntity.size());
+			if(instructionsEntity.isEmpty()) {	//Arraja error al no encontrar datos desde la BD
+				LOG.error("Error al listar countstatus, no se encuntra el recurso solicitado.");
+				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Error al listar countstatus, no se encuntra el recurso solicitado");
 			}
+
 			
 			for (Instruction entity : instructionsEntity) {
 				LOG.info("HOLA 2: "+ entity.toString());
@@ -330,22 +331,7 @@ public class IntructionService implements IInstructionService{
 					.description(StatusInstruction.RECHAZADA.toString())
 					.quantity(arregloContadorStatus[4]).build());
 			
-			
-		}catch (Exception e) {
-			// TODO: handle exception
-			LOG.error("Error:"+e.getMessage());
-			
-			if(business != null ) {
-				
-				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere subBusiness.id, para realizar una búsqueda completa");
-			}else if(subBusiness != null ) {
-				
-				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere business.id, para realizar una búsqueda completa");
-			}
-				
-				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Error al listar countstatus, no se encuntra el recurso");
-
-		}
+		//Se crea respuesta final DTO
 		
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
