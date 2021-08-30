@@ -23,6 +23,6 @@ public class CountInstructionsResDto implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Data data;
+	private CountInstructionsDataDto data;
 
 }
