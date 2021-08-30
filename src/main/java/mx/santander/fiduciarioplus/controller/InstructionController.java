@@ -64,7 +64,7 @@ public class InstructionController {
 	}
 	
 	
-	@GetMapping(value = "count_status", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/instructions/count_status", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> countStatusInstructions(@RequestParam(name = "buc", required = true)String buc,
 			  										 @RequestParam(name = "business.id", required = false)Integer businessId,
 			  										@RequestParam(name = "subBusiness.id", required = false)Integer subBusinessId){
