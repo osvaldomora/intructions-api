@@ -255,7 +255,7 @@ public class IntructionService implements IInstructionService{
 	public CountInstructionsResDto getListCountInstructions(String buc,Integer business, Integer subBusiness) {
 		// TODO Auto-generated method stub
 		
-		int arregloContadorStatus[] = new int [5];
+
 		Integer auxBusiness=null;
 		Integer auxSubBusiness=null;
 		
@@ -295,6 +295,7 @@ public class IntructionService implements IInstructionService{
 			for(int i=6; i>=0;i--) {
 				Date fechaFiltro = DateUtil.getDateMinusOrSumDay(today,-i);
 				LOG.info("Fecha Filtro: {}",fechaFiltro.toString());
+				int arregloContadorStatus[] = new int [5];
 				List<CountInstructionsStatusDto> listStatus = new ArrayList<>();
 				List<CountInstructionsStatusDto> countInstructionsStatusDto = new ArrayList<>();
 				List<Instruction> instructionsEntFiltroDay = instructionsEntity.stream().filter( e -> e.getDate().getDay() == fechaFiltro.getDay()).collect(Collectors.toList());
@@ -313,7 +314,7 @@ public class IntructionService implements IInstructionService{
 					case "PROCESO":
 							arregloContadorStatus[2]+=1;
 						break;
-					case "ATENDIA":
+					case "ATENDIDA":
 							arregloContadorStatus[3]+=1;
 						break;
 					case "RECHAZADA":
