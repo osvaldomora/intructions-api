@@ -3,8 +3,6 @@ package mx.santander.fiduciarioplus.dto.countstatesinstructions;
 
 import java.io.Serializable;
 
-import javax.annotation.Generated;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;

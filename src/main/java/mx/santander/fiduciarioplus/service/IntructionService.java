@@ -19,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.qos.logback.classic.pattern.Util;
+import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionStatusPerDay;
 import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsDataDto;
 import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsDatesDto;
 import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsResDto;
@@ -42,6 +44,7 @@ import mx.santander.fiduciarioplus.model.instruction.Instruction;
 import mx.santander.fiduciarioplus.model.sendinstruction.SendFIle;
 import mx.santander.fiduciarioplus.repository.IInstrucctionFIleRepository;
 import mx.santander.fiduciarioplus.repository.IInstructionRepository;
+import mx.santander.fiduciarioplus.util.DateUtil;
 import mx.santander.fiduciarioplus.util.FileTool;
 import mx.santander.fiduciarioplus.util.FolioRandom;
 
@@ -259,11 +262,14 @@ public class IntructionService implements IInstructionService{
 		
 		CountInstructionsResDto countInstructionsResDto = null;
 		List<Instruction> instructionsEntity = null;
-		List<CountInstructionsStatusDto> countInstructionsStatusDto = new ArrayList<>();
 		
-			
+		Date today = DateUtil.getFinalDate();
+		Date startWeek = DateUtil.getFinalDate(DateUtil.getDateMinusOrSumDay(today,-6));
+		
+		LOG.info("Fecha Hoy: {}",today.toString());
+		LOG.info("Fecha inicio Semana (-7 dias): {}", startWeek);
 			if(business==null && subBusiness==null) {
-				instructionsEntity = instructionRepository.findByBuc(buc);
+				instructionsEntity = instructionRepository.findByBucAndDateInstructionBetweenDates(buc, startWeek, today);
 			}else {
 				if(subBusiness == null ) {	//Arroja error si no se envia el subBusiness.id, no se puede generar consulta sin este dato				
 					throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere subBusiness.id, para realizar una búsqueda completa");
@@ -271,81 +277,99 @@ public class IntructionService implements IInstructionService{
 				if(business == null ) {	//Arroja error si no se envia el  business.id, no se puede generar consulta sin este dato	
 					throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere business.id, para realizar una búsqueda completa");
 				}
-				instructionsEntity = instructionRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(buc,business,subBusiness);
+				instructionsEntity = instructionRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(buc,business,subBusiness, startWeek, today);
 				auxBusiness=business;
 				auxSubBusiness=subBusiness;
 			}
 			
 			LOG.info("Tamaño de instructionsEntity_countStatus: {}",instructionsEntity.size());
+			for(Instruction e : instructionsEntity) {
+				LOG.info("Entity: {}",e.toString());
+			}
 			if(instructionsEntity.isEmpty()) {	//Arraja error al no encontrar datos desde la BD
 				LOG.error("Error al listar countstatus, no se encuntra el recurso solicitado.");
 				throw new PersistenDataException(PersistenDataCatalog.PSID003,"Error al listar countstatus, no se encuntra el recurso solicitado");
 			}
 
-			
-			for (Instruction entity : instructionsEntity) {
-				LOG.info("HOLA 2: "+ entity.toString());
+			List<CountInstructionStatusPerDay> perDay = new ArrayList<>();
+			for(int i=6; i>=0;i--) {
+				Date fechaFiltro = DateUtil.getDateMinusOrSumDay(today,-i);
+				LOG.info("Fecha Filtro: {}",fechaFiltro.toString());
+				List<CountInstructionsStatusDto> listStatus = new ArrayList<>();
+				List<CountInstructionsStatusDto> countInstructionsStatusDto = new ArrayList<>();
+				List<Instruction> instructionsEntFiltroDay = instructionsEntity.stream().filter( e -> e.getDate().getDay() == fechaFiltro.getDay()).collect(Collectors.toList());
+				int totalStatus = 0;
 				
-				switch (entity.getStatus()) {
-				case "SOLICITADA":
-						arregloContadorStatus[0]+=1;
-					break;
-				case "ENTREGADA":
-						arregloContadorStatus[1]+=1;
-					break;
-				case "PROCESO":
-						arregloContadorStatus[2]+=1;
-					break;
-				case "ATENDIA":
-						arregloContadorStatus[3]+=1;
-					break;
-				case "RECHAZADA":
-						arregloContadorStatus[4]+=1;
-					break;
+				for (Instruction entity : instructionsEntFiltroDay) {
+					LOG.info("entity: "+ entity.toString());
+					totalStatus += 1;
+					switch (entity.getStatus()) {
+					case "SOLICITADA":
+							arregloContadorStatus[0]+=1;
+						break;
+					case "ENTREGADA":
+							arregloContadorStatus[1]+=1;
+						break;
+					case "PROCESO":
+							arregloContadorStatus[2]+=1;
+						break;
+					case "ATENDIA":
+							arregloContadorStatus[3]+=1;
+						break;
+					case "RECHAZADA":
+							arregloContadorStatus[4]+=1;
+						break;
+					}
 				}
+				
+				countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+						.id(StatusInstruction.SOLICITADA.getId())
+						.description(StatusInstruction.SOLICITADA.toString())
+						.quantity(arregloContadorStatus[0]).build());
+				
+				countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+						.id(StatusInstruction.ENTREGADA.getId())
+						.description(StatusInstruction.ENTREGADA.toString())
+						.quantity(arregloContadorStatus[1]).build());
+				
+
+				countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+						.id(StatusInstruction.PROCESO.getId())
+						.description(StatusInstruction.PROCESO.toString())
+						.quantity(arregloContadorStatus[2]).build());
+				
+				countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+						.id(StatusInstruction.ATENDIDA.getId())
+						.description(StatusInstruction.ATENDIDA.toString())
+						.quantity(arregloContadorStatus[3]).build());
+				
+				countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
+						.id(StatusInstruction.RECHAZADA.getId())
+						.description(StatusInstruction.RECHAZADA.toString())
+						.quantity(arregloContadorStatus[4]).build());
+				LOG.info("Fecha Filtro: {} antes de perDay",fechaFiltro.toString());
+				perDay.add(CountInstructionStatusPerDay.builder()
+								.date(fechaFiltro)
+								.nameDay(DateUtil.getDayOfWeek(fechaFiltro))
+								.status(countInstructionsStatusDto)
+								.totalStatus(totalStatus)
+								.build());
 			}
 			
-			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
-					.id(StatusInstruction.SOLICITADA.getId())
-					.description(StatusInstruction.SOLICITADA.toString())
-					.quantity(arregloContadorStatus[0]).build());
 			
-			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
-					.id(StatusInstruction.ENTREGADA.getId())
-					.description(StatusInstruction.ENTREGADA.toString())
-					.quantity(arregloContadorStatus[1]).build());
 			
-
-			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
-					.id(StatusInstruction.PROCESO.getId())
-					.description(StatusInstruction.PROCESO.toString())
-					.quantity(arregloContadorStatus[2]).build());
 			
-			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
-					.id(StatusInstruction.ATENDIDA.getId())
-					.description(StatusInstruction.ATENDIDA.toString())
-					.quantity(arregloContadorStatus[3]).build());
 			
-			countInstructionsStatusDto.add(CountInstructionsStatusDto.builder()
-					.id(StatusInstruction.RECHAZADA.getId())
-					.description(StatusInstruction.RECHAZADA.toString())
-					.quantity(arregloContadorStatus[4]).build());
-			
-		//Se crea respuesta final DTO
-		
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-		calendar.add(calendar.DATE, -7);
-		
+		//Se crea respuesta final DTO		
 		countInstructionsResDto = CountInstructionsResDto.builder()
 				.data(CountInstructionsDataDto.builder()
 						.buc(instructionsEntity.get(0).getBuc().toString())
 						.business(auxBusiness)
 						.subBusiness(auxSubBusiness)
-						.status(countInstructionsStatusDto)
+						.statusPerDay(perDay)
 						.dates(CountInstructionsDatesDto.builder()
-								.start(calendar.getTime())
-								.end(new Date())
+								.start(startWeek)
+								.end(today)
 								.build())
 						.build())
 				.build();

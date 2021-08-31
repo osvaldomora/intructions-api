@@ -71,7 +71,7 @@ public class InstructionController {
 		CountInstructionsResDto countInstructionsResDto = instructionService.getListCountInstructions(buc,businessId,subBusinessId);
 		
 		
-		if(countInstructionsResDto.getData().getStatus().isEmpty()) {
+		if(countInstructionsResDto.getData().getStatusPerDay().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 		
