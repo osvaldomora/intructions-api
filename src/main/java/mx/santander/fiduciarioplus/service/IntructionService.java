@@ -350,7 +350,7 @@ public class IntructionService implements IInstructionService{
 				LOG.info("Fecha Filtro: {} antes de perDay",fechaFiltro.toString());
 				perDay.add(CountInstructionStatusPerDay.builder()
 								.date(fechaFiltro)
-								.nameDay(DateUtil.getDayOfWeek(fechaFiltro))
+								.day(DateUtil.getDayOfWeek(fechaFiltro))
 								.status(countInstructionsStatusDto)
 								.totalStatus(totalStatus)
 								.build());
