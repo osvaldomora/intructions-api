@@ -24,5 +24,5 @@ public class CountInstructionStatusPerDay implements Serializable{
 	private List<CountInstructionsStatusDto> status = new ArrayList<>();
 	private Integer totalStatus;
 	private Date date;
-	private String nameDay;
+	private String day;
 }
