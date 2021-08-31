@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -236,8 +237,15 @@ public class IntructionService implements IInstructionService{
 					instructionsDto.add(instructionDto);
 				}
 				
+				/*Se hace un filtro, mostrando las instrucciones menores al dia de al consulta, no puede visualizar fechas superiores al dia de hoy
+				Esto se quitara solo es para mostrar adecuado a front por datos cargador para futuro*/
 				//Se ordena por fecha ascendente
-				instructionsDto = instructionsDto.stream().sorted((inst1, inst2) -> inst2.getDate().compareTo(inst1.getDate())).collect(Collectors.toList());
+				Calendar diaDespues = DateUtil.setTime(new Date(), 23, 59, 59);
+				//LOG.info("Fecha maxima del dia de hoy: "+diaDespues.getTime());
+				instructionsDto = instructionsDto.stream()
+										.filter( inst -> inst.getDate().compareTo(diaDespues.getTime()) < 0)	//Quitar filtro al pasar al arquetipo
+										.sorted((inst1, inst2) -> inst2.getDate().compareTo(inst1.getDate()))
+										.collect(Collectors.toList());
 				
 				LOG.info("TAMAÑO INSTRUCTIONS DTO: "+instructionsDto.size());
 				
@@ -262,14 +270,17 @@ public class IntructionService implements IInstructionService{
 		
 		CountInstructionsResDto countInstructionsResDto = null;
 		List<Instruction> instructionsEntity = null;
+		Calendar dateRequest = GregorianCalendar.getInstance();
+		Calendar today = DateUtil.setTime(new Date(), 23, 59, 59);
+		Calendar startWeek = DateUtil.setTime(DateUtil.getDateMinusOrSumDay(today.getTime(),-6).getTime(), 0, 0, 0);
 		
-		Date today = DateUtil.getFinalDate();
-		Date startWeek = DateUtil.getFinalDate(DateUtil.getDateMinusOrSumDay(today,-6));
 		
-		LOG.info("Fecha Hoy: {}",today.toString());
-		LOG.info("Fecha inicio Semana (-7 dias): {}", startWeek);
+		LOG.info("Fecha fin semana: {}",dateRequest.getTime());
+		LOG.info("Fecha hoy DB: {}",today.getTime());
+		LOG.info("Fecha inicio semana (-7 dias): {}", startWeek.getTime());
+		
 			if(business==null && subBusiness==null) {
-				instructionsEntity = instructionRepository.findByBucAndDateInstructionBetweenDates(buc, startWeek, today);
+				instructionsEntity = instructionRepository.findByBucAndDateInstructionBetweenDates(buc, startWeek.getTime(), today.getTime());
 			}else {
 				if(subBusiness == null ) {	//Arroja error si no se envia el subBusiness.id, no se puede generar consulta sin este dato				
 					throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere subBusiness.id, para realizar una búsqueda completa");
@@ -277,14 +288,14 @@ public class IntructionService implements IInstructionService{
 				if(business == null ) {	//Arroja error si no se envia el  business.id, no se puede generar consulta sin este dato	
 					throw new PersistenDataException(PersistenDataCatalog.PSID003,"Se requiere business.id, para realizar una búsqueda completa");
 				}
-				instructionsEntity = instructionRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(buc,business,subBusiness, startWeek, today);
+				instructionsEntity = instructionRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(buc,business,subBusiness, startWeek.getTime(), today.getTime());
 				auxBusiness=business;
 				auxSubBusiness=subBusiness;
 			}
 			
 			LOG.info("Tamaño de instructionsEntity_countStatus: {}",instructionsEntity.size());
 			for(Instruction e : instructionsEntity) {
-				LOG.info("Entity: {}",e.toString());
+				//LOG.info("Entity: {}",e.toString());
 			}
 			if(instructionsEntity.isEmpty()) {	//Arraja error al no encontrar datos desde la BD
 				LOG.error("Error al listar countstatus, no se encuntra el recurso solicitado.");
@@ -292,17 +303,22 @@ public class IntructionService implements IInstructionService{
 			}
 
 			List<CountInstructionStatusPerDay> perDay = new ArrayList<>();
+			
 			for(int i=6; i>=0;i--) {
-				Date fechaFiltro = DateUtil.getDateMinusOrSumDay(today,-i);
-				LOG.info("Fecha Filtro: {}",fechaFiltro.toString());
+				Calendar fechaFiltro = DateUtil.getDateMinusOrSumDay(dateRequest.getTime(),-i);
+				//LOG.info("Fecha Filtro: {}",fechaFiltro.toString());
 				int arregloContadorStatus[] = new int [5];
+				int totalStatus = 0;
 				List<CountInstructionsStatusDto> listStatus = new ArrayList<>();
 				List<CountInstructionsStatusDto> countInstructionsStatusDto = new ArrayList<>();
-				List<Instruction> instructionsEntFiltroDay = instructionsEntity.stream().filter( e -> e.getDate().getDay() == fechaFiltro.getDay()).collect(Collectors.toList());
-				int totalStatus = 0;
+				
+				List<Instruction> instructionsEntFiltroDay = instructionsEntity.stream()
+																.filter( e -> DateUtil.getDay(e.getDate()) == DateUtil.getDay(fechaFiltro.getTime()))
+																.collect(Collectors.toList());
+
 				
 				for (Instruction entity : instructionsEntFiltroDay) {
-					LOG.info("entity: "+ entity.toString());
+					//LOG.info("entity: "+ entity.toString());
 					totalStatus += 1;
 					switch (entity.getStatus()) {
 					case "SOLICITADA":
@@ -348,20 +364,18 @@ public class IntructionService implements IInstructionService{
 						.id(StatusInstruction.RECHAZADA.getId())
 						.description(StatusInstruction.RECHAZADA.toString())
 						.quantity(arregloContadorStatus[4]).build());
-				LOG.info("Fecha Filtro: {} antes de perDay",fechaFiltro.toString());
+				LOG.info("Fecha Filtro: {} antes de perDay",fechaFiltro.getTime());
 				perDay.add(CountInstructionStatusPerDay.builder()
-								.date(fechaFiltro)
-								.day(DateUtil.getDayOfWeek(fechaFiltro))
+								.date(fechaFiltro.getTime())
+								.day(DateUtil.getNameDayOfWeek(fechaFiltro.getTime()))
 								.status(countInstructionsStatusDto)
 								.totalStatus(totalStatus)
 								.build());
+				
 			}
 			
 			
-			
-			
-			
-		//Se crea respuesta final DTO		
+		//Se crea respuesta Lista de Estatus por Dia		
 		countInstructionsResDto = CountInstructionsResDto.builder()
 				.data(CountInstructionsDataDto.builder()
 						.buc(instructionsEntity.get(0).getBuc().toString())
@@ -369,8 +383,8 @@ public class IntructionService implements IInstructionService{
 						.subBusiness(auxSubBusiness)
 						.statusPerDay(perDay)
 						.dates(CountInstructionsDatesDto.builder()
-								.start(startWeek)
-								.end(today)
+								.start(startWeek.getTime())
+								.end(dateRequest.getTime())
 								.build())
 						.build())
 				.build();
