@@ -172,9 +172,9 @@ public class IntructionService implements IInstructionService{
 	@Override
 	public InstructionsResDto getListInstructions(String buc, Integer business, Integer subBusiness) throws ParseException {
 		// TODO Auto-generated method stub
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date dateA = new Date();
-
+		/**Consultar lista hasta 3 meses anteriores*/
+		Calendar date3monthLast = DateUtil.getDateMinusOrSumMonth(new Date(), -3);
+		LOG.info("Fecha 3 meses antes consulta-instrucciones: {}",date3monthLast.getTime());
 		
 		//Se crea el objeto de instructionsResDto
 				InstructionsResDto instructionsResDto = null;
@@ -194,7 +194,7 @@ public class IntructionService implements IInstructionService{
 				try {
 					//Se obtienen todos los valores de la entidad 
 					//instructionsEntity = instructionRepository.findAll();
-					instructionsEntity = instructionRepository.findByBucAndIdBusinessAndIdSubBusiness(buc, business, subBusiness);					
+					instructionsEntity = instructionRepository.findByBucAndIdBusinessAndIdSubBusinessAndDateAfter(buc, business, subBusiness,date3monthLast.getTime());					
 					//Se trata la exception si viene vacia la lista de la entidad 
 				}catch (Exception e) {
 					// TODO: handle exception
@@ -223,16 +223,7 @@ public class IntructionService implements IInstructionService{
 									.name(entity.getNameInstruction())
 									.authorization(false) //Se agrega como false, ya que el negocio ahorita se necesita asi
 									.build())
-							.date(format.parse(entity.getDate().toString()))
-							/*
-							.date(InstructionDto.builder()
-									.date(formato.parse(entity.getDate()))
-									.build())
-							*/
-							//.date(InstructionDto.builder().
-									//.date(new Date(fo))
-									//.date(new Date(entity.parse(getDate())))
-									//.build())
+							.date(entity.getDate())
 							.build();
 					instructionsDto.add(instructionDto);
 				}

@@ -17,7 +17,7 @@ import mx.santander.fiduciarioplus.model.instruction.Instruction;
 public interface IInstructionRepository extends JpaRepository<Instruction, Long>{
 	
 
-	List<Instruction> findByBucAndIdBusinessAndIdSubBusiness(String buc, Integer business, Integer subBusiness);
+	List<Instruction> findByBucAndIdBusinessAndIdSubBusinessAndDateAfter(String buc, Integer business, Integer subBusiness, Date date);
 
 	@Query( value = "SELECT * FROM INSTRUCTION u WHERE u.buc = ?1 AND u.date_instruction >= ?2 AND u.date_instruction <= ?3 ", nativeQuery = true) 
 	List<Instruction> findByBucAndDateInstructionBetweenDates(String buc, Date dateStart, Date dateEnd);

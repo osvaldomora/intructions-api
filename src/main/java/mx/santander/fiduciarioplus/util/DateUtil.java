@@ -59,6 +59,21 @@ public class DateUtil {
 	}
 	
 	/**
+	 * Este metodo permite sumar o restar meses a una fecha, se ingresa un numero positivo para sumar
+	 * y uno negativo para restar.
+	 * @param date Fecha la cual se quiere modificar
+	 * @param days Numero de meses a restar/sumar
+	 * @return Objecto Calendar con la fecha actualizada
+	 */
+	public static Calendar getDateMinusOrSumMonth(Date date, int month) {
+
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(date);
+		calendar.add(Calendar.MONTH, month);
+		return calendar;
+	}
+	
+	/**
 	 * Este metodo permite modificar el tiempo de una fecha ingresada. 
 	 * Consideraciones a tener:
 	 * Si se asignan valores positivos o negativos superiores a 23 hrs, estos se sumaran o restaran,
