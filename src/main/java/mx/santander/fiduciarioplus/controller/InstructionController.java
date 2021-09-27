@@ -13,18 +13,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Setter;
 import mx.santander.fiduciarioplus.dto.instruction.count.CountInstructionsResDto;
 import mx.santander.fiduciarioplus.dto.instruction.list.InstructionsResDto;
 import mx.santander.fiduciarioplus.dto.typeInstruction.download.TypeInstrFileDownloadDto;
 import mx.santander.fiduciarioplus.dto.typeInstruction.list.TypeInstructionsDataResDto;
+import mx.santander.fiduciarioplus.dto.validateInstruction.DataValidationInstructionResDto;
 import mx.santander.fiduciarioplus.service.IInstructionSentService;
 import mx.santander.fiduciarioplus.service.ITypeInstructionService;
+import mx.santander.fiduciarioplus.service.IValidationIntstructionService;
 
 
 /**
@@ -49,6 +53,9 @@ public class InstructionController {
 	//Variable de servicio de instrucciones
 	@Autowired
 	private IInstructionSentService instructionSendService;
+	
+	@Autowired
+	IValidationIntstructionService validationIntstructionService;
 	
 	
 	@GetMapping("/instructions/count_status")
@@ -147,6 +154,13 @@ public class InstructionController {
 	            .contentLength(typeInsFileDowload.getDoc().length)
 	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
 	            .body(resource);
+	}
+	
+	@PostMapping(value = "/validate-file", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> validation(@RequestParam(name = "files", required = true) List<MultipartFile> files) {
+		DataValidationInstructionResDto dataResponse=validationIntstructionService.validate(files);
+	
+		return ResponseEntity.status(HttpStatus.CREATED).body(dataResponse);
 	}
 	
 }

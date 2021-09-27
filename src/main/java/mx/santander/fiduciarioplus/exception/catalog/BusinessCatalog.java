@@ -14,7 +14,9 @@ public enum BusinessCatalog {
 	
 	BUSI001("BusinessException001","BUSI.001","Error el documento no puede exceder el minimo y maximo de tamaño.",HttpStatus.BAD_REQUEST,LevelException.WARN),
 	BUSI002("BusinessException002","BUSI.002","Formato de archivo no soportado.",HttpStatus.BAD_REQUEST,LevelException.WARN),
-	BUSI003("BusinessException003","BUSI.003","Se ha excedido el limite de archivos.",HttpStatus.BAD_REQUEST,LevelException.WARN);
+	BUSI003("BusinessException003","BUSI.003","Se ha excedido el limite de archivos.",HttpStatus.BAD_REQUEST,LevelException.WARN),
+	BUSI004("BusinessException004","BUSI.004","Formato no valido.",HttpStatus.BAD_REQUEST,LevelException.WARN),
+	;
 
 	private final String type;
 	private final String code;
