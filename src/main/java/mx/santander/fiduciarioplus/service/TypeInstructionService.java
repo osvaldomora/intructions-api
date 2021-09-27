@@ -67,7 +67,7 @@ public class TypeInstructionService implements ITypeInstructionService{
 	@Override
 	public TipoInstruccionModel findById(Long id) {
 		Optional<TipoInstruccionModel> tipoInstModel = this.typeInstructionRepository.findById(id);
-		if(tipoInstModel.isEmpty()) {
+		if(!tipoInstModel.isPresent()) {
 			return null;
 		}
 		return tipoInstModel.get();

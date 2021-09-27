@@ -39,7 +39,7 @@ import mx.santander.fiduciarioplus.service.IValidationIntstructionService;
  */
 @Setter
 @RestController
-@RequestMapping("/instructions/v1")
+@RequestMapping("/api/instructions/v1")
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET,RequestMethod.POST}, allowedHeaders = "*")
 public class InstructionController {
 
