@@ -4,13 +4,17 @@ import org.springframework.http.HttpStatus;
 
 /**
  * Este ENUM define el catalog de errores de la categoria Business
- *
+ * Esta clase permite la enumeracion de diferentes mensajes de excepcion
+ * utilizados en los cuerpos de respuesta HTTP arrojados por el servicio
+ * Es posible agregar nuevos mensajes personalizados
+ * para permitir que el servicio sea mas explicito,
+ * recordando siempre que es importante evitar arrojar informacion sensible.
  */
 public enum BusinessCatalog {
 	
-	BUSI001("BusinessException","BUSI.001","Error el documento no puede exceder el minimo y maximo de tamaño.",HttpStatus.BAD_REQUEST,LevelException.WARN),
-	BUSI002("BusinessException","BUSI.002","Formato de archivo no soportado.",HttpStatus.BAD_REQUEST,LevelException.WARN),
-	BUSI003("BusinessException","BUSI.003","Se ha excedido el limite de archivos.",HttpStatus.BAD_REQUEST,LevelException.WARN);
+	BUSI001("BusinessException001","BUSI.001","Error el documento no puede exceder el minimo y maximo de tamaño.",HttpStatus.BAD_REQUEST,LevelException.WARN),
+	BUSI002("BusinessException002","BUSI.002","Formato de archivo no soportado.",HttpStatus.BAD_REQUEST,LevelException.WARN),
+	BUSI003("BusinessException003","BUSI.003","Se ha excedido el limite de archivos.",HttpStatus.BAD_REQUEST,LevelException.WARN);
 
 	private final String type;
 	private final String code;
@@ -46,7 +50,5 @@ public enum BusinessCatalog {
 	public LevelException getLevelException() {
 		return levelException;
 	}
-	
-	
 
 }

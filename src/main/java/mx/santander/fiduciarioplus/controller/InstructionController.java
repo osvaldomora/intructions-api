@@ -1,88 +1,152 @@
 package mx.santander.fiduciarioplus.controller;
 
 import java.util.List;
-import java.text.ParseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import mx.santander.fiduciarioplus.dto.countstatesinstructions.CountInstructionsResDto;
-import mx.santander.fiduciarioplus.dto.listinstructions.InstructionsResDto;
-import mx.santander.fiduciarioplus.dto.sendinstruction.response.DataSendInstructionResDto;
-import mx.santander.fiduciarioplus.dto.typeinstruction.DataTypeInstructionResDto;
-import mx.santander.fiduciarioplus.service.IInstructionService;
+import lombok.Setter;
+import mx.santander.fiduciarioplus.dto.instruction.count.CountInstructionsResDto;
+import mx.santander.fiduciarioplus.dto.instruction.list.InstructionsResDto;
+import mx.santander.fiduciarioplus.dto.typeInstruction.download.TypeInstrFileDownloadDto;
+import mx.santander.fiduciarioplus.dto.typeInstruction.list.TypeInstructionsDataResDto;
+import mx.santander.fiduciarioplus.service.IInstructionSentService;
 import mx.santander.fiduciarioplus.service.ITypeInstructionService;
 
+
+/**
+ * Este controlador permite realizar diferentes operaciones HTTP, asociado al recurso intructions
+ * Se cuenta con los service: 
+ * 1.- typeInstruction: Servicio encargado de manejar recurso de tipo de instrucciones
+ *
+ */
+@Setter
 @RestController
-@CrossOrigin(origins = "*",methods = {RequestMethod.GET,RequestMethod.POST}, allowedHeaders = "*")
-@RequestMapping("/api/instructions/v1")
+@RequestMapping("/instructions/v1")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET,RequestMethod.POST}, allowedHeaders = "*")
 public class InstructionController {
 
-	@Autowired
-	ITypeInstructionService typeInstructionService;
+	//La Constante LOGGER. Obtiene el Logger de la clase
+	private static final Logger LOGGER = LoggerFactory.getLogger(InstructionController.class);
 	
+	//Variable de servicio de Tipo de Instruccion
 	@Autowired
-	IInstructionService instructionService;
-
-	@GetMapping(value = "/type_instructions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listTypeInstructions() {
-		DataTypeInstructionResDto dataTypeInstructionResDto = typeInstructionService.getInstructions();
-		return ResponseEntity.status(HttpStatus.OK).body(dataTypeInstructionResDto);
-	}
+	private ITypeInstructionService typeInstructionService;
 	
-	@PostMapping(value = "/instructions", 
-				produces = MediaType.APPLICATION_JSON_VALUE, 
-				consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> saveInstructions(@RequestParam(name = "files", required = true) List<MultipartFile> files, 
-											  @RequestParam(name = "instruction", required = true) String instruction){
-		DataSendInstructionResDto dataSendInstructionResDto = instructionService.save(instruction, files);
-		if(dataSendInstructionResDto == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+	//Variable de servicio de instrucciones
+	@Autowired
+	private IInstructionSentService instructionSendService;
+	
+	
+	@GetMapping("/instructions/count_status")
+	public ResponseEntity<?> countInstructions(@RequestParam(name = "buc", required = true)String buc,
+			  									@RequestParam(name = "business.id", required = false)Long businessId,
+			  									@RequestParam(name = "subBusiness.id", required = false)Long subBusinessId){
+		
+		LOGGER.info("Metodo: GET, Operacion: findAllInstructions, buc: {}, businnes: {}, subBusiness: {}",buc,businessId,subBusinessId);
+		CountInstructionsResDto countInstructionsResDto = this.instructionSendService.countInstructions(buc, businessId, subBusinessId);
+		
+		if(countInstructionsResDto.getData().getStatusPerDay().isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(dataSendInstructionResDto);
+		return ResponseEntity.status(HttpStatus.OK).body(countInstructionsResDto);
 	}
 	
-	@GetMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> listInstructions(@RequestParam(name = "buc", required = true)String buc,
-											  @RequestParam(name = "business.id", required = true)Integer businessId,
-											  @RequestParam(name = "subBusiness.id", required = true)Integer subBusinessId) throws ParseException{
-		InstructionsResDto instructionsResDto = instructionService.getListInstructions(buc,businessId,subBusinessId);
+	
+
+	/**
+     * Este es un metodo HTTP GET consulta el recurso de instrucciones
+	 * y en la implementacion de la interfaz de negocio instructionSendServicee
+	 * puede realizar ciertas transformaciones DTO a la consulta para enriquecer la presentacion.
+	 * 
+	 * Este metodo es idempotente, y sus procesos derivados NUNCA deben modificar el estado de algun recurso en el servidor. 
+	 * TODOS los procesos desencadenados deben ser solo de consulta.
+	 * 
+	 * @param buc identificador unico del cliente
+	 * @param businessId contrato de cliente
+	 * @param subBusinessId subContrato de cliente
+	 * @return lista de clientes asociadas al cliente
+	 */
+	@GetMapping("/instructions")
+	public ResponseEntity<?> findAllInstructions(@RequestParam(name = "buc", required = true)String buc,
+			  									@RequestParam(name = "business.id", required = true)Long businessId,
+			  									@RequestParam(name = "subBusiness.id", required = true)Long subBusinessId){
+		
+		LOGGER.info("Metodo: GET, Operacion: findAllInstructions, buc: {}, businnes: {}, subBusiness: {}",buc,businessId,subBusinessId);
+		InstructionsResDto instructionsResDto = this.instructionSendService.findAll(buc, businessId, subBusinessId);
+		
 		if(instructionsResDto.getData().getInstructions().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(instructionsResDto);
 	}
 	
-	
-	@GetMapping(value = "/instructions/count_status", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> countStatusInstructions(@RequestParam(name = "buc", required = true)String buc,
-			  										 @RequestParam(name = "business.id", required = false)Integer businessId,
-			  										@RequestParam(name = "subBusiness.id", required = false)Integer subBusinessId){
-		CountInstructionsResDto countInstructionsResDto = instructionService.getListCountInstructions(buc,businessId,subBusinessId);
-		
-		
-		if(countInstructionsResDto.getData().getStatusPerDay().isEmpty()) {
+    /**
+     * Este es un metodo HTTP GET consulta el recurso de tipo de instruccion
+	 * y en la implementacion de la interfaz de negocio typeInstructionService
+	 * puede realizar ciertas transformaciones DTO a la consulta para enriquecer la presentacion.
+	 * 
+	 * Este metodo es idempotente, y sus procesos derivados NUNCA deben modificar el estado de algun recurso en el servidor. 
+	 * TODOS los procesos desencadenados deben ser solo de consulta.
+	 * 
+     * @return Una lista de typeInstructions en un objeto JSON obtenido
+     */
+	@GetMapping("/type_instructions")
+	public ResponseEntity<?> findAllTypeInstructions(){
+		LOGGER.info("Metodo: GET, Operacion: findAllTypeInstructions");
+		TypeInstructionsDataResDto resDto = typeInstructionService.findAllListTypInstr();
+		if(resDto.getData().getTypeInstructions().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}
-		
-		return ResponseEntity.status(HttpStatus.OK).body(countInstructionsResDto);
+		return ResponseEntity.status(HttpStatus.OK).body(resDto);
 	}
 	
-	/*Errores 
-	 * MissingServletRequestParameterException
-	 * MissingServletRequestPartException
-	 * HttpMediaTypeNotSupportedException
-	 * MaxUploadSizeExceededException
+	/**
+     * Este es un metodo HTTP GET descarga la plantilla de un tipo de instruccion
+	 * y en la implementacion de la interfaz de negocio typeInstructionService
+	 * puede realizar ciertas transformaciones DTO a la consulta para enriquecer la presentacion.
+	 * 
+	 * Este metodo es idempotente, y sus procesos derivados NUNCA deben modificar el estado de algun recurso en el servidor. 
+	 * TODOS los procesos desencadenados deben ser solo de consulta.
+	 * @param id Identificador de tipo de instruccion
+	 * @return 
 	 */
+	@GetMapping("/type_instructions/{id}/download")
+	public ResponseEntity<?> download(@PathVariable(name = "id", required = true) Long id){
+		LOGGER.info("Metodo: GET, Operacion: download, tipoInstruccion a descargar id: {}",id);
+		//Dto con info del archivo
+		TypeInstrFileDownloadDto typeInsFileDowload = this.typeInstructionService.downloadDoc(id);
+		
+		//Recurso a descargar
+		ByteArrayResource resource = new ByteArrayResource(typeInsFileDowload.getDoc());
+		
+		//Se crean header para descargar
+		LOGGER.info("Metodo: GET, Operacion: download, se crean headers para descargar...");
+		HttpHeaders headers = new HttpHeaders();
+		//Se obtiene nombre del archivo
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+typeInsFileDowload.getFullName());
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+		
+		return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(typeInsFileDowload.getDoc().length)
+	            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+	            .body(resource);
+	}
 	
 }
