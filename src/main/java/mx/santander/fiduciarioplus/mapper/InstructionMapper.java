@@ -22,7 +22,7 @@ public final class InstructionMapper {
 		InstructionsDto instructionsDto = null;
 		
 		instructionsDto= InstructionsDto.builder()
-							.folio(instrModel.getIdFkBuc())
+							.folio(instrModel.getIdFolio())
 							.business(InstructionsBusinessDto.builder()
 											.id(instrModel.getIdNoContr())
 											.build())
