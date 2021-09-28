@@ -29,6 +29,7 @@ public class TypeInstructionDto implements Serializable{
 	private String name;
     private Integer codeDoc;
     private String urlInstruction;
+    private boolean requiredLayout;
     @Builder.Default
     private List<TypeInstructionsFileDto> files = new ArrayList<>();
 }

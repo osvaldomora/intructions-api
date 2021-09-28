@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.Setter;
 import mx.santander.fiduciarioplus.dto.instruction.count.CountInstructionsResDto;
 import mx.santander.fiduciarioplus.dto.instruction.list.InstructionsResDto;
+import mx.santander.fiduciarioplus.dto.instruction.send.res.SendInstrResDto;
 import mx.santander.fiduciarioplus.dto.typeInstruction.download.TypeInstrFileDownloadDto;
 import mx.santander.fiduciarioplus.dto.typeInstruction.list.TypeInstructionsDataResDto;
 import mx.santander.fiduciarioplus.dto.validateInstruction.DataValidationInstructionResDto;
@@ -56,6 +57,34 @@ public class InstructionController {
 	
 	@Autowired
 	IValidationIntstructionService validationIntstructionService;
+	
+	
+	/**
+	 * Este es un metodo HTTP GET consulta el recurso de tipo de instruccion y en la
+	 * implementacion de la interfaz de negocio typeInstructionService puede
+	 * realizar ciertas transformaciones DTO a la consulta para enriquecer la
+	 * presentacion.
+	 * 
+	 * Este metodo es idempotente, y sus procesos derivados NUNCA deben modificar el
+	 * estado de algun recurso en el servidor. TODOS los procesos desencadenados
+	 * deben ser solo de consulta.
+	 * 
+	 * @return Una lista de typeInstructions en un objeto JSON obtenido
+	 */
+	@PostMapping(value = "/instructions", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> saveInstructions(@RequestParam(name = "files", required = true) List<MultipartFile> files,
+			@RequestParam(name = "instruction", required = true) String instruction) {
+		
+		LOGGER.info("Metodo: POST, Operacion: saveInstructions, tamanio files: {}, JSON entrada: {}",files.size(),instruction);
+		
+		SendInstrResDto instrResDto = instructionSendService.saveInstructions(instruction, files);
+		
+		if (instrResDto.getData().getFolios().isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(instrResDto);
+	}
+	
 	
 	
 	@GetMapping("/instructions/count_status")

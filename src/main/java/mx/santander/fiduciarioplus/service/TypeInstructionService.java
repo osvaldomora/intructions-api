@@ -109,7 +109,13 @@ public class TypeInstructionService implements ITypeInstructionService{
 										.id(typeInst.getIdList().intValue())
 										.name(typeInst.getDscTpoInstr())
 										.codeDoc(typeInst.getCodDoc().intValue())
+										.requiredLayout(false)
 										.build();
+			//Existe layout
+			if(typeInst.getFlgLayou()!=0) {
+				tyDto.setRequiredLayout(true);
+			}
+			
 			//Se forma url para descarga de plantilla
 			String urlInstr = URI_DOWNLOAD + typeInst.getIdList() + URI_DOWNLOAD_METHOD;
 			tyDto.setUrlInstruction(urlInstr);
