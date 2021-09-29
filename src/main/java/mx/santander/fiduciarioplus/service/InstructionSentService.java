@@ -336,16 +336,16 @@ public class InstructionSentService implements IInstructionSentService{
 		Long fileSize = file.getSize();
 		if(fileSize > MAX_SIZE_FILE_BYTES) {	//Valida tamanio de archivo, tiene que se menor a 15MB
 			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, se supero peso de archivo: {}, archivo: {}"+file.getSize(),file.getName());
-			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo ha superado el limite de MB, archivo: "+file.getName());
+			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo ha superado el limite de MB, archivo: "+file.getOriginalFilename());
 		}
 		if(fileSize == 0) {	//Valida que el archivo no este vacio
-			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, el archivo esta vacio: {}, archivo: "+file.getSize(),file.getName());
-			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo no puede estar vacio, archivo: "+file.getName());
+			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, el archivo esta vacio: {}, archivo: "+file.getSize(),file.getOriginalFilename());
+			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo no puede estar vacio, archivo: "+file.getOriginalFilename());
 		}
 		//Validacion de tamaño arreglo de JSON con archivo actual
 		if(file.getSize() != fileDto.getSize()) {
 			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, error archivo enviado no concuerda con el tamanio de bytes enviado en JSON: {}",file.getName());
-			throw new BusinessException(BusinessCatalog.BUSI001, "Error archivo enviado no con cuerda con el tamanio de bytes enviado en JSON: "+file.getName());
+			throw new BusinessException(BusinessCatalog.BUSI001, "Error archivo enviado no concuerda con el tamanio de bytes enviado en JSON: "+file.getOriginalFilename()+", file tamanio: "+file.getSize()+", file arreglo tamanio: "+fileDto.getSize());
 		}
 	}
 	
