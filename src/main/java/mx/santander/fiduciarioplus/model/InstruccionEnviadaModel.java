@@ -29,7 +29,6 @@ public class InstruccionEnviadaModel {
     //@SequenceGenerator(sequenceName = "SEQFID_MX_REL_INSTR_NVAS", allocationSize = 1, name = "INSTR_NVAS_SEQ")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID_INSTR_NVAS")
-	@NotNull
 	private Long idIntrsNvas;
 	
 	@Column(name = "FK_ID_LIST")

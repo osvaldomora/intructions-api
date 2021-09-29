@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 public class InstruccionEnviada {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID_INSTR_NVAS")
 	@NotNull
 	private Long idIntrsNvas;
