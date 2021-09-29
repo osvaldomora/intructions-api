@@ -19,7 +19,7 @@ public interface IInstructionSentService {
 	
 	List<InstruccionEnviada> findByBucAndBusinessAndSubBusinessBetweenDates(String buc, Long business, Long subBusiness);
 	
-	InstruccionEnviadaModel saveInstruction(SendInstrReqDto instrReqDto);
+	InstruccionEnviadaModel saveInstruction(SendInstrReqDto instrReqDto, Long folio);
 	
 	
 	SendInstrResDto saveInstructions(String jsonRequest, List<MultipartFile> files);

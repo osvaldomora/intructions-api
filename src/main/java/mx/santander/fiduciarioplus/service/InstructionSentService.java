@@ -51,14 +51,27 @@ public class InstructionSentService implements IInstructionSentService{
 	//La Constante LOGGER. Obtiene el Logger de la clase
 	private static final Logger LOGGER = LoggerFactory.getLogger(InstructionSentService.class);
 	
+	// Variable de repositorio de Instrucciones enviadas con relaciones
 	@Autowired
 	private IInstructionSendRepository instructionSendRepository;
 	
+	// Variable de repositorio de Instrucciones enviadas 2
 	@Autowired
 	private IInstructionSendModelRepository instructionSendModelRepository;
 	
 	//Variable de tamaño de archivos 15MB
 	private final Long MAX_SIZE_FILE_BYTES = 15728640L;
+	
+	//Vatuable de comite tecnico
+	private final boolean COMITE_TECNICO = false;
+	
+	//Variable de servicio Registro de Documento
+	@Autowired
+	private IDocumentRegistrationService documentRegistrationService;
+	
+	//Variablde de servicio de Instruccion anexo
+	@Autowired
+	private IAnexoInstructionService anexoInstructionService;
 	
 	@Override
 	public List<InstruccionEnviada> findByBucAndNoContrAndNoSubContr(String idBuc, Long idNoContr, Long idNoSubContr) {
@@ -252,10 +265,15 @@ public class InstructionSentService implements IInstructionSentService{
 		return countInstructionsResDto;
 	}
 
+	/**
+	 * Este metodo permite guardar en el repositorio una instruccion
+	 * @param instrReqDto	informacion de la instruccion a guardar
+	 * @param folio valor del folio generado
+	 * @return InstruccionEnviadaModel modelo de la instruccion guardada
+	 */
 	@Override
-	public InstruccionEnviadaModel saveInstruction(SendInstrReqDto instrReqDto) {
+	public InstruccionEnviadaModel saveInstruction(SendInstrReqDto instrReqDto, Long folio) {
 		InstruccionEnviadaModel instrSendModelReq = null;
-		Long folio = new Long(String.valueOf((int)(Math.random() * 1000000)+1));
 		instrSendModelReq = InstruccionEnviadaModel.builder()
 								.idList(instrReqDto.getTypeInstruction().getId())
 								.buc(instrReqDto.getBuc().getId())
@@ -271,84 +289,192 @@ public class InstructionSentService implements IInstructionSentService{
 		return instrSendModelRes;
 	}
 
+	/**
+	 * Este metodo es el encargado de la logica de negocio al enviar una instruccion 
+	 * y sus diferentes registristros en sus respectivos repositorios, ademas realiza
+	 * las validaciones necesarias para el envio de archivos.
+	 * @param jsonRequest JSON de entrada
+	 * @param files archivos enviados a guardar
+	 * @return SendInstrResDto respuesta con los folios generados
+	 */
 	@Override
 	public SendInstrResDto saveInstructions(String jsonRequest, List<MultipartFile> files) {
+		//Instancia de objetos a trabajar
+		List<SendInstrFileDto> filesDtoTemp  = new ArrayList<>();
+		List<MultipartFile> filesTemp = new ArrayList<>();
+		List<SendIntrsFolioDto> foliosObtenidos = new ArrayList<>(); //Lista de folios para respuesta final
 		//DTO respuesta final
-				SendInstrResDto instrResDto = SendInstrResDto.builder()
-												.data(SendInstrDataDto.builder()
-														.build())
-												.build();
-				//Lista de folios para respuesta final
-				List<SendIntrsFolioDto> foliosObtenidos = new ArrayList<>();
-				// Objeto entrada Request DTO
-				SendInstrReqDto instrReqDto = null;
-				// Objeto mapeer String to DTO
-				ObjectMapper mapper = new ObjectMapper();
-				try {
-					instrReqDto = mapper.readValue(jsonRequest, SendInstrReqDto.class);
-				} catch (IOException | IllegalArgumentException e) { // Error al Mapear JSON a DTO
-					LOGGER.error("Operacion: saveInstructions, error en la estructura del JSON de entrada.");
-					throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error en la estructura del JSON de entrada.");
-				}
-				
-				//Validar cantidad de archivos, con arreglo de arhivos sean iguales
-				if(files.size() != instrReqDto.getFiles().size()) {
-					LOGGER.error("Operacion: saveInstructions, error en la estructura del JSON de entrada, los archivos enviados no corresponden con la estructura JSON.");
-					throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error en la estructura del JSON de entrada, los archivos enviados no corresponden con la estructura JSON.");
-				}
+		SendInstrResDto instrResDto = SendInstrResDto.builder()
+										.data(SendInstrDataDto.builder()
+												.build())
+										.build();
+		// Objeto entrada Request DTO
+		SendInstrReqDto instrReqDto = null;
+		// Objeto mapeer String to DTO
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			instrReqDto = mapper.readValue(jsonRequest, SendInstrReqDto.class);
+		} catch (IOException | IllegalArgumentException e) { // Error al Mapear JSON a DTO
+			LOGGER.error("Operacion: saveInstructions, error en la estructura del JSON de entrada.");
+			throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error en la estructura del JSON de entrada.");
+		}
+		
+		//Valida que no se envien archivos y arreglo vacio
+		if(instrReqDto.getFiles().isEmpty() || files.isEmpty()) {
+			LOGGER.error("Operacion: saveInstructions, error no se ha enviado una INSTRUCCION");
+			throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error se debe enviar un archivo y un item de tipo INSTRUCCION");
+		}
+		
+		//Validar cantidad de archivos, con arreglo de arhivos sean iguales
+		if(files.size() != instrReqDto.getFiles().size()) {
+			LOGGER.error("Operacion: saveInstructions, error en la estructura del JSON de entrada, los archivos enviados no corresponden con la estructura JSON.");
+			throw new InvalidDataException(InvalidDataCatalog.INVD001, "Error en la estructura del JSON de entrada, la cantidad de archivos enviados no corresponden con la estructura JSON.");
+		}
+		
+		//Obtenemos archivos temporales a procesar
+		filesDtoTemp = instrReqDto.getFiles();
+		filesTemp = files;
+		
+		/*Validaciones de archivos*/
+		int contTypeInstr = 0;
+		for(int i=0; i<filesDtoTemp.size();i++) {
+			SendInstrFileDto fileDtoToEvaluate = filesDtoTemp.get(i);
+			MultipartFile fileGoEvaluate = filesTemp.get(i);
+			//Validaciones de tamanio de archivo
+			this.validateSizeFiles(fileGoEvaluate,fileDtoToEvaluate);
+			//Validacion de formato de archivo
+			this.validateFormatFiles(fileGoEvaluate, fileDtoToEvaluate);
+			if(FileInstruction.INSTRUCCION.getName().equalsIgnoreCase(fileDtoToEvaluate.getType())) {
+				contTypeInstr++;
+			}
+		}
+		//Valida que exista solo un tipo de INSTRUCCION
+		if(contTypeInstr != 1) {
+			LOGGER.error("Operacion: saveInstructions, Error se necesita enviar solo 1 archivo de tipo INSTRUCCION");
+			throw new BusinessException(BusinessCatalog.BUSI002, "Error se necesita enviar solo 1 archivo de tipo INSTRUCCION");
+		}		
+		
+		//Ordena lista, para que instruccion sea la primera
+		this.sortList(filesDtoTemp, filesTemp);
+		
+		/*Inicio insertar instruccion
+		 * SIEMPRE, se envia primero la INSTRUCCION
+		 * para obtener el id temporal de la instruccion enviada (IdIntrsNvas), 
+		 * este ID sirve para asociar a los archivos con la instruccion
+		 */
+		SendInstrFileDto fileDtoInstruction = filesDtoTemp.get(0);	//Se obtiene el item de INSTRUCCION
+		Long folioTemp = null;
+		Long idInstrTemp = null;
+		
+		//Registar documento  BD (Registro Documento) y obtiene Folio
+		if(!COMITE_TECNICO) {	//Sin comite tecnico
+			folioTemp = this.documentRegistrationService.saveRegistrationDoc(instrReqDto, fileDtoInstruction).getNumeroUnicoDoc();
+		}
+		//Registrar instruccion BD (Instruccion Enviada)
+		idInstrTemp = this.saveInstruction(instrReqDto, folioTemp).getIdIntrsNvas();
+		/*Fin: Inicio insertar instruccion*/
+		
+		LOGGER.info("Se registran archivos ANEXOS y LAYOUT: ");
+		//Se guardan archivo (Instruccion Anexo Model)
+		this.insertDocAnexosAndLayout(filesDtoTemp, filesTemp, foliosObtenidos, instrReqDto, folioTemp, idInstrTemp);
 
-				/**Validacion de negocio, de archivos*/
-				for(int i=0; i<files.size();i++) {
-					//Archivo JSON a validar
-					SendInstrFileDto fileDto = instrReqDto.getFiles().get(i);
-					//Archivo a validar
-					MultipartFile file = files.get(i);
-					//InstruccionEnviadaModel instruccion enviada
-					InstruccionEnviadaModel instrSendModel = null;
-					
-					//Validaciones de tamanio de archivo
-					this.validateSizeFiles(file,fileDto);
-					
-					//Validacion de formato de archivo
-					this.validateFormatFiles(file, fileDto);
-					
-					boolean sinComite = false;
-					if(sinComite == false) {
-						
-						//Registrar instruccion 
-						instrSendModel = this.saveInstruction(instrReqDto);
-						
-					}
-					//Guardamos folio y solicitud de folio
-					foliosObtenidos.add(SendIntrsFolioDto.builder()
-											.folio(instrSendModel.getIdFolio())	//Folio
-											.folioRequest(instrSendModel.getIdIntrsNvas())	//Solicitud de Folio
-											.type(fileDto.getType())	//Tipo de archivo
-											.fileName(file.getOriginalFilename()) 	//Nombre de archivo
-											.dateOperation(instrSendModel.getFchRegisInsct())	//Fecha de transsaccion
-											.build());	
-				}
-				//Agregamos lista de folios a respuesta final
-				instrResDto.getData().setFolios(foliosObtenidos);
+		//Agregamos lista de folios a respuesta final
+		instrResDto.getData().setFolios(foliosObtenidos);
 
-				return instrResDto;
-	}	private void validateSizeFiles(MultipartFile file, SendInstrFileDto fileDto) {
+		return instrResDto;
+	}
+
+	/**
+	 * Este metodo permite insertar los archivos en la tabla de Instrucciones anexas, valida existe comite tecnico
+	 * @param filesDtoTemp lista de archivos con la informacion en el DTO
+	 * @param filesTemp lista de archivos
+	 * @param foliosObtenidos arreglo de folios a guardar
+	 * @param instrReqDto informacion del tipo de instruccion del request
+	 * @param folioTemp folio temporal generado
+	 * @param idInstrTemp identificador de instruccion enviada, para asociacion de los archivos anexos
+	 */
+	private void insertDocAnexosAndLayout(List<SendInstrFileDto> filesDtoTemp, List<MultipartFile> filesTemp,List<SendIntrsFolioDto> foliosObtenidos,SendInstrReqDto instrReqDto, Long folioTemp, Long idInstrTemp) {
+		Date dateInsert = null;
+		//Se recorre archivos para guardar
+		for(int i=0; i<filesTemp.size();i++) {
+			//Archivo JSON a validar
+			SendInstrFileDto fileDto = filesDtoTemp.get(i);
+			//Archivo a validar
+			MultipartFile file = filesTemp.get(i);			
+			//Registar documento  BD (Registro Documento LAYOUT y ANEXO) y obtiene Folio, sin COMITE TECNICO
+			if(!COMITE_TECNICO) {
+				if (!FileInstruction.INSTRUCCION.getName().equalsIgnoreCase(fileDto.getType())) {
+					folioTemp = this.documentRegistrationService.saveRegistrationDoc(instrReqDto, fileDto).getNumeroUnicoDoc();
+				}
+			}
+			//Se registra documentos
+			if(fileDto.getType().equalsIgnoreCase(FileInstruction.INSTRUCCION.getName())) {	//(Instruccion)
+				dateInsert = this.anexoInstructionService.save(idInstrTemp, folioTemp, file,FileInstruction.INSTRUCCION.getName()).getFchRegisInst();
+			}else if(fileDto.getType().equalsIgnoreCase(FileInstruction.ANEXO.getName())) {	//(Anexo)
+				dateInsert = this.anexoInstructionService.save(idInstrTemp, folioTemp, file,FileInstruction.ANEXO.getName()).getFchRegisInst();
+			}else {// (Layout)
+				dateInsert = this.anexoInstructionService.save(idInstrTemp, folioTemp, file,FileInstruction.LAYOUT.getName()).getFchRegisInst();
+			}
+			//Guardamos folio y solicitud de folio
+			foliosObtenidos.add(SendIntrsFolioDto.builder()
+									.folio(folioTemp)	//Folio
+									.folioRequest(idInstrTemp)	//Solicitud de Folio
+									.type(fileDto.getType())	//Tipo de archivo
+									.fileName(file.getOriginalFilename()) 	//Nombre de archivo
+									.dateOperation(dateInsert)	//Fecha de transsaccion
+									.build());	
+		}
+	}
+	
+	/**
+	 * Este metodo ordena una lista de archivos, poniendo el tipo como INSTRUCCION al inicio 
+	 * de la lista
+	 * @param filesDtoTemp lista de archivos con la informacion en el DTO
+	 * @param filesTemp lista de archivos
+	 */
+	private void sortList(List<SendInstrFileDto> filesDtoTemp, List<MultipartFile> filesTemp) {
+		//Ordena el arreglo para que instruccion sea primera posicion
+		for(int i=0;i<filesDtoTemp.size();i++) {
+			//Valida si existe archivo tipo INSTRUCCION
+			if(FileInstruction.INSTRUCCION.getName().equalsIgnoreCase(filesDtoTemp.get(i).getType())) {
+				//Se ordena archivo tipo INSTRUCCION al inicio
+				filesDtoTemp.add(0, filesDtoTemp.get(i));
+				filesTemp.add(0,filesTemp.get(i));
+				//Se elimina archivo tipo INSTRUCCION de a posicion que se obtuvo
+				filesDtoTemp.remove(i+1);
+				filesTemp.remove(i+1);
+			}
+		}
+	}
+	
+	/**
+	 * Este metodo valida el archivo y la informacion del archivo sean correctas y validan los tamanios
+	 * de los archivos.
+	 * @param file archivo a evaluar
+	 * @param fileDto informacion de archivo a evaluar
+	 */
+	private void validateSizeFiles(MultipartFile file, SendInstrFileDto fileDto) {
 		Long fileSize = file.getSize();
 		if(fileSize > MAX_SIZE_FILE_BYTES) {	//Valida tamanio de archivo, tiene que se menor a 15MB
 			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, se supero peso de archivo: {}, archivo: {}"+file.getSize(),file.getName());
 			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo ha superado el limite de MB, archivo: "+file.getOriginalFilename());
 		}
 		if(fileSize == 0) {	//Valida que el archivo no este vacio
-			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, el archivo esta vacio: {}, archivo: "+file.getSize(),file.getOriginalFilename());
+			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, el archivo esta vacio: {}, archivo: "+file.getSize(),file.getName());
 			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo no puede estar vacio, archivo: "+file.getOriginalFilename());
 		}
 		//Validacion de tamaño arreglo de JSON con archivo actual
 		if(file.getSize() != fileDto.getSize()) {
 			LOGGER.warn("Operacion: saveInstructions, subOperacion: validateSizeFiles, error archivo enviado no concuerda con el tamanio de bytes enviado en JSON: {}",file.getName());
-			throw new BusinessException(BusinessCatalog.BUSI001, "Error archivo enviado no concuerda con el tamanio de bytes enviado en JSON: "+file.getOriginalFilename()+", file tamanio: "+file.getSize()+", file arreglo tamanio: "+fileDto.getSize());
+			throw new BusinessException(BusinessCatalog.BUSI001, "Error archivo enviado no con cuerda con el tamanio de bytes enviado en JSON: "+file.getOriginalFilename());
 		}
 	}
 	
+	/**
+	 * Este metodo valida el formato de los archivos y la informacion del archivo enviado
+	 * @param file archivo a evaluar 
+	 * @param fileDto informacion del archivo a evaluar
+	 */
 	private void validateFormatFiles(MultipartFile file, SendInstrFileDto fileDto) {
 		//Validacion de formato
 		switch (fileDto.getType()) {
