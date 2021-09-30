@@ -83,6 +83,13 @@ public class InstructionSentService implements IInstructionSentService{
 		
 		//Consulta a la BD
 		listInstructionSend = this.instructionSendRepository.findByIdFkBucAndIdNoContrAndIdNoSubContrAndFchRegisInsctAfter(idBuc, idNoContr, idNoSubContr, date3monthLast.getTime());
+		
+		//Ordernar la lista por fecha mas reciente
+		
+		listInstructionSend = listInstructionSend.stream()
+												.sorted((instr1,instr2) -> instr2.getFchRegisInsct().compareTo(instr1.getFchRegisInsct()))
+												.collect(Collectors.toList());
+		
 		LOGGER.info("Tamaño de lista de instrucciones: {}",listInstructionSend.size());
 				
 		return listInstructionSend;

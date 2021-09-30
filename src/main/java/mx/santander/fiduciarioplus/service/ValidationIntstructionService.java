@@ -28,7 +28,7 @@ public class ValidationIntstructionService implements IValidationIntstructionSer
 
 	@Override
 	public DataValidationInstructionResDto validate(List<MultipartFile> files) {
-		LOG.info("ValidationIntstructionService.DataSendInstructionResDto");
+		LOG.info("Tmananio archivo a validar: {}",files.size());
 
 		// SE VA A LLAMAR EN EL SERVICIO
 		if (files.size() > 1 || files.isEmpty()) { // Se han enviado mas doumentos de los esperados
@@ -36,11 +36,7 @@ public class ValidationIntstructionService implements IValidationIntstructionSer
 			throw new BusinessException(BusinessCatalog.BUSI003, "Se han enviado mas documentos de los esperados.");
 		}
 		MultipartFile file = files.get(0);
-
-		if (!file.getContentType().equalsIgnoreCase("text/plain")) { // Valida tipo de archivo, disponible solo PDF
-			LOG.warn("WARN: BUSI.002, FORMATO ARCHIVO: " + file.getContentType());
-			throw new BusinessException(BusinessCatalog.BUSI002, "Formato aceptado: txt");
-		}
+		
 		if (file.getSize() > MAX_SIZE_FILE_BYTES) { // Valida tamanio de archivo, tiene que se menor a 15MB
 			LOG.warn("WARN: BUSI.001, TAMAÑO ARCHIVO: " + file.getSize());
 			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo ha superado el limite de MB.");
@@ -48,6 +44,10 @@ public class ValidationIntstructionService implements IValidationIntstructionSer
 		if (file.getSize() == 0) { // Valida que el archivo no este vacio
 			LOG.warn("WARD: BUSI.001, TAMAÑO ARCHIVO: " + file.getSize());
 			throw new BusinessException(BusinessCatalog.BUSI001, "El archivo no puede estar vacio.");
+		}
+		if (!file.getContentType().equalsIgnoreCase("text/plain")) { // Valida tipo de archivo, disponible solo PDF
+			LOG.warn("WARN: BUSI.002, FORMATO ARCHIVO: " + file.getContentType());
+			throw new BusinessException(BusinessCatalog.BUSI002, "Formato aceptado: txt");
 		}
 
 		DataValidationInstructionResDto dataResponse = validateFile(file);
