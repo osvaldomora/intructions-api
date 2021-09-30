@@ -82,15 +82,22 @@ public class InstructionSentService implements IInstructionSentService{
 		LOGGER.info("Fecha 3 meses antes consulta-instrucciones: {}",date3monthLast.getTime());
 		
 		//Consulta a la BD
-		listInstructionSend = this.instructionSendRepository.findByIdFkBucAndIdNoContrAndIdNoSubContrAndFchRegisInsctAfter(idBuc, idNoContr, idNoSubContr, date3monthLast.getTime());
+		//Se cambiara hasta que los datos dejen de ser ambientados ya que surgieran errores hasta el momento
+		//listInstructionSend = this.instructionSendRepository.findByIdFkBucAndIdNoContrAndIdNoSubContrAndFchRegisInsctAfter(idBuc, idNoContr, idNoSubContr, date3monthLast.getTime());
+		
+		//Esta consulta se usa provisoinalmente
+		listInstructionSend = this.instructionSendRepository.findStatusByBucAndIdBusinessAndIdSubBusiness(idBuc, idNoContr, idNoSubContr, date3monthLast.getTime(), new Date());
 		
 		//Ordernar la lista por fecha mas reciente
-		
 		listInstructionSend = listInstructionSend.stream()
 												.sorted((instr1,instr2) -> instr2.getFchRegisInsct().compareTo(instr1.getFchRegisInsct()))
 												.collect(Collectors.toList());
 		
 		LOGGER.info("Tamaño de lista de instrucciones: {}",listInstructionSend.size());
+		
+		for(InstruccionEnviada i : listInstructionSend) {
+			LOGGER.info("Instruccion modelo: id: {}, folio: {}, fecha: {}",i.getIdIntrsNvas(),i.getIdFolio(),i.getFchRegisInsct());
+		}
 				
 		return listInstructionSend;
 	}
