@@ -347,7 +347,7 @@ public class InstructionSentService implements IInstructionSentService{
 		
 		//Ordena por nombre
 		filesDtoTemp = filesDtoTemp.stream().sorted((fileD1,fileD2) -> fileD1.getName().compareTo(fileD2.getName())).collect(Collectors.toList());
-		filesTemp = filesTemp.stream().sorted((file1,file2) -> file1.getName().compareTo(file2.getName())).collect(Collectors.toList());
+		filesTemp = filesTemp.stream().sorted((file1,file2) -> file1.getOriginalFilename().compareTo(file2.getOriginalFilename())).collect(Collectors.toList());
 		
 		//Ordena lista, para que instruccion sea la primera
 		//this.sortList(filesDtoTemp, filesTemp);
