@@ -94,10 +94,7 @@ public class InstructionController {
 		
 		LOGGER.info("Metodo: GET, Operacion: findAllInstructions, buc: {}, businnes: {}, subBusiness: {}",buc,businessId,subBusinessId);
 		CountInstructionsResDto countInstructionsResDto = this.instructionSendService.countInstructions(buc, businessId, subBusinessId);
-		
-		if(countInstructionsResDto.getData().getStatusPerDay().isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-		}
+
 		return ResponseEntity.status(HttpStatus.OK).body(countInstructionsResDto);
 	}
 	
