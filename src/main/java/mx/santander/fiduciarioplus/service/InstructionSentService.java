@@ -393,7 +393,7 @@ public class InstructionSentService implements IInstructionSentService{
 		Long idInstrTemp = null;
 		
 		//Registar documento  BD (Registro Documento) y obtiene Folio
-		if(!COMITE_TECNICO) {	//Sin comite tecnico
+		if(instrReqDto.isCommittee() == false) {	//Sin comite tecnico
 			folioTemp = this.documentRegistrationService.saveRegistrationDoc(instrReqDto, fileDtoInstruction).getNumeroUnicoDoc();
 		}
 		//Registrar instruccion BD (Instruccion Enviada)
@@ -429,7 +429,7 @@ public class InstructionSentService implements IInstructionSentService{
 			//Archivo a validar
 			MultipartFile file = filesTemp.get(i);			
 			//Registar documento  BD (Registro Documento LAYOUT y ANEXO) y obtiene Folio, sin COMITE TECNICO
-			if(!COMITE_TECNICO) {
+			if(instrReqDto.isCommittee() == false) {
 				if (!FileInstruction.INSTRUCCION.getName().equalsIgnoreCase(fileDto.getType())) {
 					folioTemp = this.documentRegistrationService.saveRegistrationDoc(instrReqDto, fileDto).getNumeroUnicoDoc();
 				}
